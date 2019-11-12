@@ -4,7 +4,5 @@ This is a project about create a new map editor website for Transformice.com wit
 
 In progress ...
 
-
-https://maelnilba.github.io/MES/SME/index.html
-[Test](SME/index.html)
+[Map Editor Studio](SME/index.html) 
 
