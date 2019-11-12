@@ -4,5 +4,5 @@ This is a project about create a new map editor website for Transformice.com wit
 
 In progress ...
 
-[Map Editor Studio](SME/index.html) 
+[Map Editor Studio](index.html) 
 
