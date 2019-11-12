@@ -212,7 +212,7 @@ function Editing(){
     get_pc(){
         return {x:(this.x1+this.x2)/2,y:(this.y1+this.y2)/2};
     }
-
+    
     set_index(index){
         this.z = index;
     }
