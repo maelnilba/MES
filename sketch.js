@@ -47,7 +47,7 @@ function draw() {
 
    // console.log(); // FOR NOOB TESTING
     // TODO -------------------
-    // ADDING NAVBAR WITH PROPERTIES
+    // ADDING NAVBAR WITH PROPERTIES -- 50%
     // MAKE PROPERTIES WORK
         
     
@@ -105,6 +105,7 @@ function Drawing(){
         }
 
         if (locked === false && dragged === false && isDrawing === true){
+                    isEdit.selectindex = index;
                     isDrawing = false;
                     index += 1;
         } 
