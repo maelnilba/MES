@@ -26,7 +26,6 @@
 .draw-settings div {
     width: 200px;
     float: right;
-    display: inline-block;
 }
 
 #menuToggle input
