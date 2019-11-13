@@ -6,3 +6,6 @@ In progress ...
 
 [Map Editor Studio](index.html) 
 
+
+
+Uses : P5 and jQuery MiniColors Libraries
