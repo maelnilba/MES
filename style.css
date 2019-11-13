@@ -30,17 +30,31 @@
     justify-content: flex-end;
     color: white;
 }
+.colorpicker{
 
-.colorpicker {
-   
 }
+.minicolor-input {
+    border-width: 0px;
+}
+.minicolors-panel.minicolors-slider-hue.minicolors-with-swatches {
+    background-color: #253741;
+    border: solid 1px #253741;
+
+}
+
+.minicolors-swatches {
+    height:20px;
+}
+
+.minicolors-swatch.minicolors-sprite {
+    height:20px;
+    width:20px;
+}
+
 .item-color{
     flex:1;
 }
-.item-color input{
-   
-    
-}
+
 
 
 #show-draw-settings {

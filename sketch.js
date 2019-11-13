@@ -22,7 +22,7 @@ Select = {state:false,p:0}; // --
 
 mspos = {x:0,y:0}; // CURSOS POSITION
 
-$('#defaultcolor').minicolors({ inline:true, opacity: true, theme:'draw',format: 'rgb'}); // CREATE COLOR SCHEME FOR DEFAULT
+$('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'rgb',swatches: ["blue", "red"]}); // CREATE COLOR SCHEME FOR DEFAULT
 $('#defaultcolor').minicolors('value','324650');
 
 }
