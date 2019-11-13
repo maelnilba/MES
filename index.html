@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link type="text/css" rel="stylesheet" href="style.css">
-    <script src="p5.js"></script>
-    <script src="sketch.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="/jquery-minicolors/jquery.minicolors.js"></script>
+    <link href="/jquery-minicolors/jquery.minicolors.css" rel="stylesheet" type="text/css" />
+
+
     <title>Drawing</title>
 </head>
 <body>
@@ -16,15 +19,22 @@
                 <img src="icons/brushicon.png" alt="brushicon" id="brushlogo">
             
             
-            <div class="draw-settings">
+            <nav class="draw-settings">
                 <!-- ALL SETTINGS ON THIS DIV -->
-                <div>TEST</div>
-                <div>TEST</div>
-                <div>TEST</div>
-                <div>TEST</div>
+                <ul>
+                    <li>
+                        DEFAULT SETTINGS
+                    </li>
+                   <li class="colorpicker">
+                        <input  type="text" value="#0088cc" name="defaultcolor" id="defaultcolor" />
+                   </li> 
+                   <li class="item-color">
+                    <label for="defaultcolorval">Color :</label>
+                     <input type="text" value="" id="defaultcolorval" />  
+                   </li>
+                </ul>
 
-
-            </div>  
+              </nav>  
             
 
 
@@ -32,7 +42,9 @@
 
             <div class="navbar"></div> <!-- THE NAVBAR DESIGN -->
         </div>       
-    
-    
+
+
+        <script src="p5.js"></script>
+        <script src="sketch.js"></script>
 </body>
 </html>

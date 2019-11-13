@@ -13,7 +13,6 @@ function setup(){
         joints.push(new Joints());
               }
 
-              
 index = 0; // Z VALUE
 locked = false;dragged = false; // VAR MOUSEACTIONS
 isDrawing = false; // VAR ACTIONS
@@ -23,6 +22,8 @@ Select = {state:false,p:0}; // --
 
 mspos = {x:0,y:0}; // CURSOS POSITION
 
+$('#defaultcolor').minicolors({ inline:true, opacity: true, theme:'draw',format: 'rgb'}); // CREATE COLOR SCHEME FOR DEFAULT
+$('#defaultcolor').minicolors('value','324650');
 
 }
 
@@ -41,14 +42,30 @@ function draw() {
              joints[i].display();
     } // DISPLAY ALL JOINTS CREATED
        
+    // PROPERTIES SETTINGS 
+    
+    if (!($('#defaultcolorval').is(":hover"))) {
+        document.getElementById("defaultcolorval").value = $('#defaultcolor').minicolors('rgbaString');
+      }
+    else {
+    console.log(document.getElementById("defaultcolorval").value);  
+    $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
+    }  
+    
+    // TODO function RGB TO HEX AND HEX TO RGB
+    //
+    //
+
+
     Cursoring(); // CURSOR FUNCTION
         Drawing(); // DRAWING FUNCTION 
             Editing(); // EDITING FUNCTION
 
    // console.log(); // FOR NOOB TESTING
     // TODO -------------------
-    // ADDING NAVBAR WITH PROPERTIES -- 50%
-    // MAKE PROPERTIES WORK
+    // ADDING NAVBAR WITH PROPERTIES -- 70%
+    // MAKE PROPERTIES WORK -- 20%
+    // MAKE NAVBAR AND SETTINGS PRETTY
         
     
 
@@ -60,6 +77,14 @@ function draw() {
 // MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
 function mousePressed() {
+
+    if (document.getElementById("show-draw-settings").checked) {
+        SpaceNotAllowed = 250;
+    }
+    else {
+        SpaceNotAllowed = 50;
+    }
+
     if (mouseX > SpaceNotAllowed) { // CANNOT DRAW IF MOUSE ON PARAMETERS
         locked = true;
     }
