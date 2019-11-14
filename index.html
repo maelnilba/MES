@@ -43,7 +43,8 @@
                    </li>
                    <li class="item-color">
                        <label>Thickness : &nbsp;</label>
-                       <input type="range" id="defaulteval" min="1" max="250" value="2" step="1" />
+                       <input type="range" id="defaulteval" min="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1" />
+                       <input type="text" id="defaultevalin" oninput="updateDefaulteSlider(this.value);" value="">
                    </li>
                 </ul>
 

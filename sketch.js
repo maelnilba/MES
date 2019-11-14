@@ -251,10 +251,12 @@ function Cursoring() {
 function Editing(){
     if (isEdit.state === true) {
         if (isEdit.pnumber === 1){ // MOVE P1
+            joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p1(mspos.x,mspos.y);
             joints[isEdit.selectindex].display();
         }
         else if (isEdit.pnumber === 2){ // MOVE P2
+            joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p2(mspos.x,mspos.y);
             joints[isEdit.selectindex].display();
         }
@@ -266,12 +268,16 @@ function Editing(){
             isEdit.pcenter = joints[isEdit.selectindex].get_pc();
             isEdit.taked = true;
             }   // CALC THE GAP BETWEEN THE MOUSEPOS AND THE ORIGINAL POSITION
+            joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p1(isEdit.p1pos.x-(isEdit.pcenter.x-+mspos.x),isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y));
             joints[isEdit.selectindex].set_p2(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x),isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y));
+            joints[isEdit.selectindex].display();
         }
         if (locked === false){
             isEdit.state = false;isEdit.taked = false;
+            joints[isEdit.selectindex].set_alpha(1);
         }
+       
     }
 }
 
@@ -298,6 +304,28 @@ function hexToRgb(hex) {
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
   }
+
+
+
+  function updateDefaulteInput(val) {
+    document.getElementById('defaultevalin').value=val; 
+  }
+
+  function updateDefaulteSlider(val) {
+    val = Number(val);
+    if (!(Number.isInteger(val))){
+        val = 2;
+    }
+      if (val > 260){
+          val = 260;
+      }
+      else if (val < 1){
+          val = 1;
+      }
+    document.getElementById('defaulteval').value=val; 
+  }
+
+
 
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 
