@@ -23,8 +23,8 @@ DefaultAlpha = 1;
 DefaultE = 2;
 
 mspos = {x:0,y:0}; // CURSOS POSITION
-swatchescolor = [{name:"White",color:"FFFFFF"},{name:"Black",color:"000000"}];
-
+swatchescolor = [{name:"1",color:""},{name:"2",color:""},{name:"3",color:""},{name:"4",color:""},{name:"5",color:""},{name:"6",color:""},{name:"7",color:""}];
+swatchesindex = {z:0, previous:0};
 $('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'hex',swatches: swatchescolor}); // CREATE COLOR SCHEME FOR DEFAULT
 $('#defaultcolor').minicolors('value','324650');
 
@@ -46,14 +46,17 @@ function draw() {
     } // DISPLAY ALL JOINTS CREATED
        
     // PROPERTIES SETTINGS  
+
+
+
     if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) {
         $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
-       // swatchescolor.push();
        
     }
     else {
         rgbval = $('#defaultcolor').minicolors('rgbObject');
         DefaultColor = rgbval;
+        document.getElementById('directDcolor').style.backgroundColor = rgbToHex(rgbval.r,rgbval.g,rgbval.b);
         $('#defaultcolor').minicolors({
             change: document.getElementById("defaultcolorval").value = rgbToHex(rgbval.r,rgbval.g,rgbval.b).toUpperCase()
           });
@@ -64,6 +67,7 @@ function draw() {
     }
     else {
         DefaultAlpha = $('#defaultcolor').minicolors('opacity');
+        document.getElementById('directDcolor').style.opacity = $('#defaultcolor').minicolors('opacity');
         $('#defaultcolor').minicolors({        
             change: document.getElementById("defaultalphaval").value = $('#defaultcolor').minicolors('opacity')
           });
@@ -71,10 +75,7 @@ function draw() {
 
     DefaultE = document.getElementById('defaulteval').value;
 
-    
-
-
-
+   // swatchescolor.push
     
     // TODO function RGB TO HEX AND HEX TO RGB
     //
@@ -161,9 +162,34 @@ function Drawing(){
                     isEdit.selectindex = index;
                     isDrawing = false;
                     index += 1;
+                    console.log(swatchesindex.z);
+                    if (swatchesindex.z === 0){
+                        swatchesindex.previous = 6;
+                    }
+                    else {
+                        swatchesindex.previous = swatchesindex.z-1;
+                    }
+                
+                    if (swatchesindex.z > 6){
+                        swatchesindex.z = 0;
+                    }
+
+                    if (!(rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b) === swatchescolor[swatchesindex.previous].color)) {
+                        swatchescolor[swatchesindex.z] = {name: "swatchesindex", color: rgbToHex(rgbval.r,rgbval.g,rgbval.b)};
+                        $('#defaultcolor').minicolors('settings',{swatches: swatchescolor});
+                            swatchesindex.z++;
+                    }
+                            
+                                             
+                        
+                       
+                    
+                    
+
+                     
         } 
     }
-    
+
 }
 
 function Cursoring() {
