@@ -1,3 +1,8 @@
+// TODO -------------------
+// ADDING NAVBAR WITH PROPERTIES -- 70%
+// MAKE PROPERTIES WORK -- 50%
+// MAKE NAVBAR AND SETTINGS PRETTY
+
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 let joints = []
@@ -20,11 +25,13 @@ isEdit = {state: false, pnumber: 0, selectindex: 0, taked: false, p1pos:0, p2pos
 Select = {state:false,p:0}; // --
 DefaultColor = {r:255,g:255,b:0};
 DefaultAlpha = 1;
-DefaultE = 2;
+DefaultE = 2; // DEFAULT VALUE
 
 mspos = {x:0,y:0}; // CURSOS POSITION
-swatchescolor = [{name:"1",color:""},{name:"2",color:""},{name:"3",color:""},{name:"4",color:""},{name:"5",color:""},{name:"6",color:""},{name:"7",color:""}];
-swatchesindex = {z:0, previous:0};
+
+// SET COLOR PICKER AND HISTORY COLOR
+swatchescolor = [{name:"?",color:""},{name:"?",color:""},{name:"?",color:""},{name:"?",color:""},{name:"?",color:""},{name:"?",color:""},{name:"?",color:""}];
+swatchesindex = {z:0, previous:0, checking: false};
 $('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'hex',swatches: swatchescolor}); // CREATE COLOR SCHEME FOR DEFAULT
 $('#defaultcolor').minicolors('value','324650');
 
@@ -49,8 +56,9 @@ function draw() {
 
 
 
-    if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) {
+    if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) { 
         $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
+        
        
     }
     else {
@@ -62,8 +70,9 @@ function draw() {
           });
     }
 
-    if (($('#defaultalphaval').is(":hover")) || ($('#defaultalphaval').is(":focus"))) {
+    if (($('#defaultalphaval').is(":hover")) || ($('#defaultalphaval').is(":focus"))) { 
         $('#defaultcolor').minicolors('opacity',document.getElementById("defaultalphaval").value);
+        
     }
     else {
         DefaultAlpha = $('#defaultcolor').minicolors('opacity');
@@ -75,11 +84,6 @@ function draw() {
 
     DefaultE = document.getElementById('defaulteval').value;
 
-   // swatchescolor.push
-    
-    // TODO function RGB TO HEX AND HEX TO RGB
-    //
-    //
 
 
     Cursoring(); // CURSOR FUNCTION
@@ -87,15 +91,9 @@ function draw() {
             Editing(); // EDITING FUNCTION
 
    // console.log(); // FOR NOOB TESTING
-    // TODO -------------------
-    // ADDING NAVBAR WITH PROPERTIES -- 70%
-    // MAKE PROPERTIES WORK -- 20%
-    // MAKE NAVBAR AND SETTINGS PRETTY
+    
         
-    
 
-    
-    
 }
      
 
@@ -162,7 +160,9 @@ function Drawing(){
                     isEdit.selectindex = index;
                     isDrawing = false;
                     index += 1;
-                    console.log(swatchesindex.z);
+
+                    // HISTORY COLORS SET
+        
                     if (swatchesindex.z === 0){
                         swatchesindex.previous = 6;
                     }
@@ -174,8 +174,21 @@ function Drawing(){
                         swatchesindex.z = 0;
                     }
 
-                    if (!(rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b) === swatchescolor[swatchesindex.previous].color)) {
-                        swatchescolor[swatchesindex.z] = {name: "swatchesindex", color: rgbToHex(rgbval.r,rgbval.g,rgbval.b)};
+                    for (i = 0; i < swatchescolor.length; i++) {
+                        if (!(i === swatchesindex.z)){
+                            if ((rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b) === swatchescolor[i].color)) {
+                                swatchescolor.checking = false;
+                                break;
+                             }
+                             else {
+                                swatchescolor.checking = true;
+                             }
+                        }
+                        
+                    }
+
+                    if (swatchescolor.checking === true) {
+                        swatchescolor[swatchesindex.z] = {name: rgbToHex(rgbval.r,rgbval.g,rgbval.b).toUpperCase(), color: rgbToHex(rgbval.r,rgbval.g,rgbval.b)};
                         $('#defaultcolor').minicolors('settings',{swatches: swatchescolor});
                             swatchesindex.z++;
                     }
@@ -280,7 +293,11 @@ function hexToRgb(hex) {
   } : null;
 }
 
+// CANVAS FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
 
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+  }
 
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link type="text/css" rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
     <script src="/jquery-minicolors/jquery.minicolors.js"></script>
     <link href="/jquery-minicolors/jquery.minicolors.css" rel="stylesheet" type="text/css" />
@@ -23,7 +24,7 @@
                 <!-- ALL SETTINGS ON THIS DIV -->
                 <ul>
                     <li>
-                        DEFAULT SETTINGS
+                        <label>DEFAULT SETTINGS</label>
                     </li>
                     <li>
                             <div class="directDcolor" id="directDcolor"></div>
@@ -32,15 +33,16 @@
                         <input  type="text" value="" name="defaultcolor" id="defaultcolor" /> <!-- MAX AND MIN LENGTH -->
                    </li>
                    <li class="item-color">
-                    <label for="defaultcolorval">Color :</label>
+                    <label for="defaultcolorval">C:&nbsp;</label>
                      <input class="paramdrw" type="text" value="" id="defaultcolorval" />  
+                     <label for="defaultalphaval">A:&nbsp;</label>
+                     <input class="paramdrw" type="number" step="0.1" value="1" id="defaultalphaval" />
                    </li>
-                   <li>
-                        <label for="defaultalphaval">Alpha :</label>
-                        <input class="paramdrw" type="number" step="0.1" value="1" id="defaultalphaval" />
+                   <li class="item-color">
+                        
                    </li>
-                   <li>
-                       <label>Thickness :</label>
+                   <li class="item-color">
+                       <label>Thickness : &nbsp;</label>
                        <input type="range" id="defaulteval" min="1" max="250" value="2" step="1" />
                    </li>
                 </ul>
