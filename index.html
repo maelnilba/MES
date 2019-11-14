@@ -26,11 +26,19 @@
                         DEFAULT SETTINGS
                     </li>
                    <li class="colorpicker">
-                        <input  type="text" value="#0088cc" name="defaultcolor" id="defaultcolor" />
+                        <input  type="text" value="" name="defaultcolor" id="defaultcolor" /> <!-- MAX AND MIN LENGTH -->
                    </li> 
                    <li class="item-color">
                     <label for="defaultcolorval">Color :</label>
-                     <input type="text" value="" id="defaultcolorval" />  
+                     <input class="paramdrw" type="text" value="" id="defaultcolorval" />  
+                   </li>
+                   <li>
+                        <label for="defaultalphaval">Alpha :</label>
+                        <input class="paramdrw" type="number" step="0.1" value="1" id="defaultalphaval" />
+                   </li>
+                   <li>
+                       <label>Thickness :</label>
+                       <input type="range" id="defaulteval" min="1" max="250" value="2" step="1" />
                    </li>
                 </ul>
 

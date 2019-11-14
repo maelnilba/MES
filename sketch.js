@@ -17,12 +17,15 @@ index = 0; // Z VALUE
 locked = false;dragged = false; // VAR MOUSEACTIONS
 isDrawing = false; // VAR ACTIONS
 isEdit = {state: false, pnumber: 0, selectindex: 0, taked: false, p1pos:0, p2pos:0, pcenter:0};
-
 Select = {state:false,p:0}; // --
+DefaultColor = {r:255,g:255,b:0};
+DefaultAlpha = 1;
+DefaultE = 2;
 
 mspos = {x:0,y:0}; // CURSOS POSITION
+swatchescolor = [{name:"White",color:"FFFFFF"},{name:"Black",color:"000000"}];
 
-$('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'rgb',swatches: ["blue", "red"]}); // CREATE COLOR SCHEME FOR DEFAULT
+$('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'hex',swatches: swatchescolor}); // CREATE COLOR SCHEME FOR DEFAULT
 $('#defaultcolor').minicolors('value','324650');
 
 }
@@ -42,15 +45,36 @@ function draw() {
              joints[i].display();
     } // DISPLAY ALL JOINTS CREATED
        
-    // PROPERTIES SETTINGS 
-    
-    if (!($('#defaultcolorval').is(":hover"))) {
-        document.getElementById("defaultcolorval").value = $('#defaultcolor').minicolors('rgbaString');
-      }
+    // PROPERTIES SETTINGS  
+    if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) {
+        $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
+       // swatchescolor.push();
+       
+    }
     else {
-    console.log(document.getElementById("defaultcolorval").value);  
-    $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
-    }  
+        rgbval = $('#defaultcolor').minicolors('rgbObject');
+        DefaultColor = rgbval;
+        $('#defaultcolor').minicolors({
+            change: document.getElementById("defaultcolorval").value = rgbToHex(rgbval.r,rgbval.g,rgbval.b).toUpperCase()
+          });
+    }
+
+    if (($('#defaultalphaval').is(":hover")) || ($('#defaultalphaval').is(":focus"))) {
+        $('#defaultcolor').minicolors('opacity',document.getElementById("defaultalphaval").value);
+    }
+    else {
+        DefaultAlpha = $('#defaultcolor').minicolors('opacity');
+        $('#defaultcolor').minicolors({        
+            change: document.getElementById("defaultalphaval").value = $('#defaultcolor').minicolors('opacity')
+          });
+    }
+
+    DefaultE = document.getElementById('defaulteval').value;
+
+    
+
+
+
     
     // TODO function RGB TO HEX AND HEX TO RGB
     //
@@ -116,7 +140,11 @@ function Drawing(){
         if (mouseIsPressed){
             
             if (locked === true && dragged === false && isDrawing === false){
-                    
+
+                    joints[index].set_color(DefaultColor.r,DefaultColor.g,DefaultColor.b); // DEFAULT SETTER
+                    joints[index].set_alpha(DefaultAlpha);
+                    joints[index].set_e(DefaultE);
+
                     joints[index].set_p1(mspos.x,mspos.y);
                     joints[index].set_p2(mspos.x,mspos.y);
                     joints[index].set_index(index)
@@ -207,6 +235,27 @@ function Editing(){
         }
     }
 }
+
+
+
+
+// COLOR FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
+
+function rgbToHex(r, g, b) {
+    return ("#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1));
+  }
+
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+
+
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 
   class Joints{
@@ -255,6 +304,19 @@ function Editing(){
         return this.pointsalpha;
     }
 
+    set_color(r,g,b){
+        this.c.r = r;        
+        this.c.g = g;        
+        this.c.b = b;        
+    }
+
+    set_alpha(alpha){
+        this.c.a = alpha;
+    }
+
+    set_e(e){
+        this.e = e;
+    }
     display(){
         // DRAW LINE
         stroke(`rgba(${this.c.r},${this.c.g},${this.c.b},${this.c.a})`); 
