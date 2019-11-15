@@ -42,10 +42,13 @@
                         
                    </li>
                    <li class="item-color">
-                       <label>Thickness : &nbsp;</label>
+                       <label class="thickness">Thickness : &nbsp;</label>
                        <input type="range" id="defaulteval" min="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1" />
                        <input type="text" id="defaultevalin" oninput="updateDefaulteSlider(this.value);" value="">
                    </li>
+                   <li>
+                        <span class="line"></span>
+                    </li>
                    <li>
                     <label>SELECTED SETTINGS</label>
                 </li>
@@ -65,10 +68,30 @@
                     
                </li>
                <li class="item-color">
-                   <label>Thickness : &nbsp;</label>
+                   <label class="thickness">Thickness : &nbsp;</label>
                    <input type="range" id="selecteval" min="1" max="260" oninput="updateSelecteInput(this.value);" value="2" step="1" />
                    <input type="text" id="selectevalin" oninput="updateSelecteSlider(this.value);" value="">
                </li>
+               <li class="item-color">
+                <label class="pinfo">P1 :</label>
+                <label>X &nbsp;</label>
+                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1x(this.value);" id="p1x" />
+                <label>&nbsp; Y &nbsp;</label>
+                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1y(this.value);" id="p1y" />
+               </li>
+               <li>
+                   <span class="line"></span>
+               </li>
+               <li class="item-color">
+                    <label class="pinfo">P2 :</label>
+                    <label>X &nbsp;</label>
+                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2x(this.value);" id="p2x" />
+                <label>&nbsp; Y &nbsp;</label>
+                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2y(this.value);" id="p2y" />
+               </li>
+
+
+
                 </ul>
 
               </nav>  

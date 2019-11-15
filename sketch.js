@@ -1,7 +1,16 @@
 // TODO -------------------
-// ADDING NAVBAR WITH PROPERTIES -- 70%
-// MAKE PROPERTIES WORK -- 50%
-// MAKE NAVBAR AND SETTINGS PRETTY
+// ADDING NAVBAR WITH PROPERTIES -- 90%
+// MAKE PROPERTIES WORK -- 80%
+// MAKE NAVBAR AND SETTINGS PRETTY -- 90%
+
+
+// CREATE DELETE BUTTON AND DUPLICATE
+// CREATE Z VALUE MINUS AND PLUS
+
+
+// CREATE FUNCTION WITH WIDTH AND HEIGHT FOR CREATE THE TFM BACKGROUND
+// MAKE P1 AND P2 POINTS VALUE CORDINATE WITH CARNIDAL 0,0 FROM TFM BACKGROUND
+
 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
@@ -25,6 +34,7 @@ isEdit = {state: false, pnumber: 0, selectindex: 0, taked: false, p1pos:0, p2pos
 Select = {state:false,p:0}; // --
 DefaultColor = {r:255,g:255,b:0};
 DefaultAlpha = 1;
+savealpha = {state: false,alpha: 1};
 DefaultE = 2; // DEFAULT VALUE
 
 mspos = {x:0,y:0}; // CURSOS POSITION
@@ -68,9 +78,8 @@ function draw() {
         rgbvald = $('#defaultcolor').minicolors('rgbObject');
         DefaultColor = rgbvald;
         document.getElementById('directDcolor').style.backgroundColor = rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b);
-        $('#defaultcolor').minicolors({
-            change: document.getElementById("defaultcolorval").value = rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b).toUpperCase()
-          });
+        document.getElementById("defaultcolorval").value = rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b).toUpperCase();
+        
     }
 
     if (($('#defaultalphaval').is(":hover")) || ($('#defaultalphaval').is(":focus"))) { 
@@ -80,12 +89,9 @@ function draw() {
     else {
         DefaultAlpha = $('#defaultcolor').minicolors('opacity');
         document.getElementById('directDcolor').style.opacity = $('#defaultcolor').minicolors('opacity');
-        $('#defaultcolor').minicolors({        
-            change: document.getElementById("defaultalphaval").value = $('#defaultcolor').minicolors('opacity')
-          });
+        document.getElementById("defaultalphaval").value = $('#defaultcolor').minicolors('opacity');
+         
     }
-
-    DefaultE = document.getElementById('defaulteval').value;
 
     // SELECT
 
@@ -97,11 +103,16 @@ function draw() {
     else {
         rgbvals = $('#selectcolor').minicolors('rgbObject');
         SelectColor = rgbvals;
+
+        if (!(rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b).toUpperCase() === document.getElementById('selectcolorval').value)){
+            joints[isEdit.selectindex].set_color(SelectColor.r,SelectColor.g,SelectColor.b);
+        }
+
         document.getElementById('directScolor').style.backgroundColor = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b);
-        $('#selectcolor').minicolors({
-            change: document.getElementById("selectcolorval").value = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b).toUpperCase()
-          });
-          joints[isEdit.selectindex].set_color(SelectColor.r,SelectColor.g,SelectColor.b);
+        document.getElementById("selectcolorval").value = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b).toUpperCase();
+        
+        
+          
     }
 
     if (($('#selectalphaval').is(":hover")) || ($('#selectalphaval').is(":focus"))) { 
@@ -110,13 +121,37 @@ function draw() {
     }
     else {
         SelectAlpha = $('#selectcolor').minicolors('opacity');
+
+        if (!(SelectAlpha === document.getElementById('selectalphaval').value)){
+            joints[isEdit.selectindex].set_alpha(SelectAlpha);          
+        }
+
         document.getElementById('directScolor').style.opacity = $('#selectcolor').minicolors('opacity');
         $('#selectcolor').minicolors({        
             change: document.getElementById("selectalphaval").value = $('#selectcolor').minicolors('opacity')
           });
-          joints[isEdit.selectindex].set_alpha(SelectAlpha);
+          
     }
 
+    // P1 AND P2 SETTINGS
+
+    if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) { 
+        document.getElementById('p1x').value = joints[isEdit.selectindex].get_p1().x;
+    }
+    
+    if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) { 
+        document.getElementById('p1y').value = joints[isEdit.selectindex].get_p1().y;
+    }
+
+    if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) { 
+        document.getElementById('p2x').value = joints[isEdit.selectindex].get_p2().x;
+    }
+
+    if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) { 
+        document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y;
+    }
+
+    
 
 
     // MAIN
@@ -126,7 +161,6 @@ function draw() {
             Editing(); // EDITING FUNCTION
 
    // console.log(); // FOR NOOB TESTING
-    
         
 
 }
@@ -196,7 +230,9 @@ function Drawing(){
                     index += 1;
 
                     // HISTORY COLORS SET
-        
+                    updateSelecteInput(DefaultE);
+                    updateSelecteSlider(DefaultE);
+
                     if (swatchesindex.z === 0){
                         swatchesindex.previous = 6;
                     }
@@ -226,15 +262,13 @@ function Drawing(){
                         $('#defaultcolor').minicolors('settings',{swatches: swatchescolor});
                         $('#selectcolor').minicolors('settings',{swatches: swatchescolor});
                             swatchesindex.z++;
-                    }
-                            
-                                             
-                        
-                       
-                    
-                    
 
-                     
+                    }
+
+                    // SYNC PARAM
+
+                    $('#selectcolor').minicolors('value',rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b));
+                    $('#selectcolor').minicolors('opacity',DefaultAlpha);                               
         } 
     }
 
@@ -285,6 +319,14 @@ function Cursoring() {
 
 function Editing(){
     if (isEdit.state === true) {
+
+
+        if (savealpha.state === false){ // SAUVEGARDE ALPHA INITIAL
+            savealpha.alpha = joints[isEdit.selectindex].c.a;
+            savealpha.state = true;
+        }
+        
+
         if (isEdit.pnumber === 1){ // MOVE P1
             joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p1(mspos.x,mspos.y);
@@ -304,15 +346,22 @@ function Editing(){
             isEdit.taked = true;
             }   // CALC THE GAP BETWEEN THE MOUSEPOS AND THE ORIGINAL POSITION
             joints[isEdit.selectindex].set_alpha(0.5);
-            joints[isEdit.selectindex].set_p1(isEdit.p1pos.x-(isEdit.pcenter.x-+mspos.x),isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y));
-            joints[isEdit.selectindex].set_p2(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x),isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y));
+            joints[isEdit.selectindex].set_p1(Math.round(isEdit.p1pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y)));
+            joints[isEdit.selectindex].set_p2(Math.round(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y)));
             
         }
         if (locked === false){
             isEdit.state = false;isEdit.taked = false;
-            joints[isEdit.selectindex].set_alpha(1);
+            joints[isEdit.selectindex].set_alpha(savealpha.alpha);
+            savealpha.state = false;
         }
-       
+
+                    // SYNC PARAM
+                    $('#selectcolor').minicolors('value',rgbToHex(joints[isEdit.selectindex].c.r,joints[isEdit.selectindex].c.g,joints[isEdit.selectindex].c.b).substring(1));
+                    $('#selectcolor').minicolors('opacity',savealpha.alpha); 
+
+                    updateSelecteInput(joints[isEdit.selectindex].e);
+                    updateSelecteSlider(joints[isEdit.selectindex].e);
     }
 }
 
@@ -347,6 +396,7 @@ function windowResized() {
   // DEFAULT
   function updateDefaulteInput(val) {
     document.getElementById('defaultevalin').value=val; 
+    DefaultE = val;
   }
 
   function updateDefaulteSlider(val) {
@@ -360,7 +410,8 @@ function windowResized() {
       else if (val < 1){
           val = 1;
       }
-    document.getElementById('defaulteval').value=val; 
+    document.getElementById('defaulteval').value = val; 
+    DefaultE = val;
   }
 
 
@@ -384,6 +435,24 @@ function windowResized() {
     document.getElementById('selecteval').value=val; 
     joints[isEdit.selectindex].set_e(val);
   }
+
+  // P1 
+function updateP1x(val){
+    joints[isEdit.selectindex].x1 = Number(val);
+}
+
+function updateP1y(val){
+    joints[isEdit.selectindex].y1 = Number(val);
+}
+
+function updateP2x(val){
+    joints[isEdit.selectindex].x2 = Number(val);
+}
+
+function updateP2y(val){
+    joints[isEdit.selectindex].y2 = Number(val);
+}
+  // P2
 
 
 

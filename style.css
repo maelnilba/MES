@@ -4,7 +4,6 @@
     box-sizing: border-box;
     overflow: hidden;
     font-family: 'Poppins', sans-serif;
-    letter-spacing: -1px;
 
 }
 
@@ -60,6 +59,24 @@
 
 .paramdrw {
     width:80px;
+}
+
+.paramdrwpts {
+  width:40px;
+}
+
+.pinfo {
+  text-align: left;
+  width: 60px;
+  
+}
+
+.line{
+  height:5px;
+}
+
+.thickness {
+  letter-spacing: -1px;
 }
 
 .directDcolor, .directScolor{
