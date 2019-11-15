@@ -62,17 +62,17 @@
     width:80px;
 }
 
-.directDcolor{
+.directDcolor, .directScolor{
     
     width: 195px;
     height: 20px;
 }
 
-#defaulteval {
+#defaulteval, #selecteval {
     width: 90px;
 }
 
-#defaultevalin {
+#defaultevalin, #selectevalin {
     width: 25px;
     margin-left: 5px;
 }

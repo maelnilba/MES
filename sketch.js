@@ -35,6 +35,9 @@ swatchesindex = {z:0, previous:0, checking: false};
 $('#defaultcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'hex',swatches: swatchescolor}); // CREATE COLOR SCHEME FOR DEFAULT
 $('#defaultcolor').minicolors('value','324650');
 
+$('#selectcolor').minicolors({animationSpeed: 1,inline:true, opacity: true, theme:'draw',format: 'hex',swatches: swatchescolor}); // CREATE COLOR SCHEME FOR DEFAULT
+$('#selectcolor').minicolors('value','324650');
+
 }
 
 
@@ -54,7 +57,7 @@ function draw() {
        
     // PROPERTIES SETTINGS  
 
-
+    // DEFAULT
 
     if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) { 
         $('#defaultcolor').minicolors('value',document.getElementById("defaultcolorval").value);
@@ -62,11 +65,11 @@ function draw() {
        
     }
     else {
-        rgbval = $('#defaultcolor').minicolors('rgbObject');
-        DefaultColor = rgbval;
-        document.getElementById('directDcolor').style.backgroundColor = rgbToHex(rgbval.r,rgbval.g,rgbval.b);
+        rgbvald = $('#defaultcolor').minicolors('rgbObject');
+        DefaultColor = rgbvald;
+        document.getElementById('directDcolor').style.backgroundColor = rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b);
         $('#defaultcolor').minicolors({
-            change: document.getElementById("defaultcolorval").value = rgbToHex(rgbval.r,rgbval.g,rgbval.b).toUpperCase()
+            change: document.getElementById("defaultcolorval").value = rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b).toUpperCase()
           });
     }
 
@@ -84,7 +87,39 @@ function draw() {
 
     DefaultE = document.getElementById('defaulteval').value;
 
+    // SELECT
 
+    if (($('#selectcolorval').is(":hover")) || ($('#selectcolorval').is(":focus"))) { 
+        $('#selectcolor').minicolors('value',document.getElementById("selectcolorval").value);
+
+       
+    }
+    else {
+        rgbvals = $('#selectcolor').minicolors('rgbObject');
+        SelectColor = rgbvals;
+        document.getElementById('directScolor').style.backgroundColor = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b);
+        $('#selectcolor').minicolors({
+            change: document.getElementById("selectcolorval").value = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b).toUpperCase()
+          });
+          joints[isEdit.selectindex].set_color(SelectColor.r,SelectColor.g,SelectColor.b);
+    }
+
+    if (($('#selectalphaval').is(":hover")) || ($('#selectalphaval').is(":focus"))) { 
+        $('#selectcolor').minicolors('opacity',document.getElementById("selectalphaval").value);
+        
+    }
+    else {
+        SelectAlpha = $('#selectcolor').minicolors('opacity');
+        document.getElementById('directScolor').style.opacity = $('#selectcolor').minicolors('opacity');
+        $('#selectcolor').minicolors({        
+            change: document.getElementById("selectalphaval").value = $('#selectcolor').minicolors('opacity')
+          });
+          joints[isEdit.selectindex].set_alpha(SelectAlpha);
+    }
+
+
+
+    // MAIN
 
     Cursoring(); // CURSOR FUNCTION
         Drawing(); // DRAWING FUNCTION 
@@ -151,8 +186,7 @@ function Drawing(){
             }
             if (locked === true && dragged === true && isDrawing === true){
                     joints[index].set_p2(mspos.x,mspos.y);
-                    joints[index].display(); // DISPLAY THE DRAWING ONE
-                    
+                    joints[index].display(); // DISPLAY THE DRAWING ONE , REQUIRED                    
             }    
         }
 
@@ -188,8 +222,9 @@ function Drawing(){
                     }
 
                     if (swatchescolor.checking === true) {
-                        swatchescolor[swatchesindex.z] = {name: rgbToHex(rgbval.r,rgbval.g,rgbval.b).toUpperCase(), color: rgbToHex(rgbval.r,rgbval.g,rgbval.b)};
+                        swatchescolor[swatchesindex.z] = {name: rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b).toUpperCase(), color: rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b)};
                         $('#defaultcolor').minicolors('settings',{swatches: swatchescolor});
+                        $('#selectcolor').minicolors('settings',{swatches: swatchescolor});
                             swatchesindex.z++;
                     }
                             
@@ -234,7 +269,7 @@ function Cursoring() {
                 Select.state = false;
             }
         }
-        // CHANGE CURSOR IF ON A POINT
+        // CHANGE CURSOR IF ON A POINT // SHOULD FIX WHEN MOUSE GO FAR AWAY
         if ((Select.state === true) && (Select.p === 1 || Select.p === 2)){
             cursor(HAND);
         }
@@ -253,12 +288,12 @@ function Editing(){
         if (isEdit.pnumber === 1){ // MOVE P1
             joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p1(mspos.x,mspos.y);
-            joints[isEdit.selectindex].display();
+           
         }
         else if (isEdit.pnumber === 2){ // MOVE P2
             joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p2(mspos.x,mspos.y);
-            joints[isEdit.selectindex].display();
+            
         }
         else if (isEdit.pnumber === 12){ // MOVE P1 AND P2
 
@@ -271,7 +306,7 @@ function Editing(){
             joints[isEdit.selectindex].set_alpha(0.5);
             joints[isEdit.selectindex].set_p1(isEdit.p1pos.x-(isEdit.pcenter.x-+mspos.x),isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y));
             joints[isEdit.selectindex].set_p2(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x),isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y));
-            joints[isEdit.selectindex].display();
+            
         }
         if (locked === false){
             isEdit.state = false;isEdit.taked = false;
@@ -306,7 +341,10 @@ function windowResized() {
   }
 
 
+// DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
 
+
+  // DEFAULT
   function updateDefaulteInput(val) {
     document.getElementById('defaultevalin').value=val; 
   }
@@ -324,6 +362,29 @@ function windowResized() {
       }
     document.getElementById('defaulteval').value=val; 
   }
+
+
+  // SELECT
+  function updateSelecteInput(val) {
+    document.getElementById('selectevalin').value=val; 
+    joints[isEdit.selectindex].set_e(val);
+  }
+
+  function updateSelecteSlider(val) {
+    val = Number(val);
+    if (!(Number.isInteger(val))){
+        val = 2;
+    }
+      if (val > 260){
+          val = 260;
+      }
+      else if (val < 1){
+          val = 1;
+      }
+    document.getElementById('selecteval').value=val; 
+    joints[isEdit.selectindex].set_e(val);
+  }
+
 
 
 
