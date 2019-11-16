@@ -1,8 +1,5 @@
 // TODO -------------------
 
-// CREATE FOREGROUND AND BACKGROUND AND MAKE POINTS ALWAYS FOREGROUND
-
-
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var joints = []
@@ -31,6 +28,8 @@ DefaultColor = {r:255,g:255,b:0};
 DefaultAlpha = 1;
 savealpha = {state: false,alpha: 1};
 DefaultE = 2; // DEFAULT VALUE
+Defaultfb = false; // BACKGROUND OR FOREGROUND
+showpoints = {p1: true,p2: true,pc: true};
 
 mspos = {x:0,y:0}; // CURSOS POSITION
 
@@ -51,15 +50,34 @@ $('#selectcolor').minicolors('value','324650');
 function draw() {
     background(106,116,149); // RESET BG EVERYTIME
     displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
+
+
     for (let i = 0; i < index; i++){
+        if (joints[i].foreground === false){
+                joints[i].display();
+        }
+
+    } 
+
+    for (let i = 0; i < index; i++){
+        if (joints[i].foreground === true){
+                joints[i].display();
+        }
+
+    } 
+
+
+    for (let i = 0; i < index; i++){
+
         if (i === isEdit.selectindex){
             joints[i].set_pointsalpha(1);
             }
         if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
              joints[i].set_pointsalpha(0.75);
             }
-             joints[i].display();
-    } // DISPLAY ALL JOINTS CREATED
+            joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
+    }
+    // DISPLAY ALL JOINTS CREATED
  
 
     // MAIN
@@ -197,8 +215,9 @@ function SyncSettingsDOM(){
         document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y-cardinal.y;
     }
 
-    document.getElementById('selectindex').value = Number(isEdit.selectindex);  
+    document.getElementById('selectindex').value = Number(isEdit.selectindex);  // SYNC INDEX
 
+        
 }
 function Drawing(){
     if (Select.state === false){
@@ -209,6 +228,7 @@ function Drawing(){
                     joints[index].set_color(DefaultColor.r,DefaultColor.g,DefaultColor.b); // DEFAULT SETTER
                     joints[index].set_alpha(DefaultAlpha);
                     joints[index].set_e(DefaultE);
+                    joints[index].set_foreground(Defaultfb);
 
                     joints[index].set_p1(mspos.x,mspos.y);
                     joints[index].set_p2(mspos.x,mspos.y);
@@ -216,7 +236,7 @@ function Drawing(){
             }
             if (locked === true && dragged === true && isDrawing === true){
                     joints[index].set_p2(mspos.x,mspos.y);
-                    joints[index].display(); // DISPLAY THE DRAWING ONE , REQUIRED                    
+                    joints[index].display();joints[index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
             }    
         }
 
@@ -263,7 +283,16 @@ function Drawing(){
                     // SYNC PARAM
 
                     $('#selectcolor').minicolors('value',rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b));
-                    $('#selectcolor').minicolors('opacity',DefaultAlpha);                               
+                    $('#selectcolor').minicolors('opacity',DefaultAlpha);  
+
+                    if (document.getElementById('selectbf').checked === true && joints[isEdit.selectindex].foreground === false){ // SYNC FB
+                        $("#selectbf").prop("checked", false);
+                        joints[isEdit.selectindex].foreground = false;
+                    } 
+                    else if (document.getElementById('selectbf').checked === false && joints[isEdit.selectindex].foreground === true){
+                        $("#selectbf").prop("checked", true);
+                        joints[isEdit.selectindex].foreground = true;
+                    }                    
         } 
     }
 
@@ -357,6 +386,16 @@ function Editing(){
 
                     updateSelecteInput(joints[isEdit.selectindex].e);
                     updateSelecteSlider(joints[isEdit.selectindex].e);
+                    console.log(document.getElementById('selectbf').checked);
+
+                    if (document.getElementById('selectbf').checked === true && joints[isEdit.selectindex].foreground === false){ // SYNC FB 
+                        $("#selectbf").prop("checked", false);
+                        joints[isEdit.selectindex].foreground = false;
+                    }
+                    else if (document.getElementById('selectbf').checked === false && joints[isEdit.selectindex].foreground === true){
+                        $("#selectbf").prop("checked", true);
+                        joints[isEdit.selectindex].foreground = true;
+                    }   
     }
 }
 
@@ -421,6 +460,20 @@ function copyjoint(ele, ele2,move_x = 0,move_y = 0){
         ele.set_color(ele2.c.r,ele2.c.g,ele2.c.b);
         ele.set_e(ele2.e);
         ele.set_alpha(ele2.c.a);
+}
+
+function updatebf(){
+    if (Defaultfb === false){
+        Defaultfb = true;
+    }
+    else if (Defaultfb === true){
+        Defaultfb = false;
+    }
+}
+
+function updatesbf(){
+    let state = document.getElementById('selectbf').checked;
+    joints[isEdit.selectindex].set_foreground(state);
 }
 
 
@@ -529,12 +582,13 @@ function updateP2y(val){
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 
   class Joints{
-    constructor(x1 = 0, y1 = 0, x2 = 0, y2 = 0, c = {r:0,g:0,b:0,a:1}, e = 10, pointsalpha = 0.75){
+    constructor(x1 = 0, y1 = 0, x2 = 0, y2 = 0, c = {r:0,g:0,b:0,a:1}, e = 10, pointsalpha = 0.75,foreground = false){
         this.x1 = x1; this.y1 = y1;
         this.x2 = x2; this.y2 = y2;
         this.c = c;
         this.e = e;
         this.pointsalpha = pointsalpha;
+        this.foreground = foreground;
     }
 
     set_p1(x,y){
@@ -578,23 +632,42 @@ function updateP2y(val){
     set_e(e){
         this.e = e;
     }
-    display(){
-        // DRAW LINE
-        stroke(`rgba(${this.c.r},${this.c.g},${this.c.b},${this.c.a})`); 
-        strokeWeight(this.e);
-        line(this.x1,this.y1,this.x2,this.y2);
+
+    set_foreground(foreground){
+        this.foreground = foreground;
+    }
+
+    displaypoints(p1 = true, p2 = true, pc = true){
         // DRAW POINTS P1 P2
+
         stroke(`rgba(255,255,0,${this.pointsalpha})`); 
         strokeWeight(2);
-        line(this.x1-5,this.y1,this.x1+5,this.y1);
-        line(this.x1,this.y1-5,this.x1,this.y1+5);
-        line(this.x2-5,this.y2,this.x2+5,this.y2);
-        line(this.x2,this.y2-5,this.x2,this.y2+5);
-        // DRAW POINTS PC
-        stroke(`rgba(0,191,255,${this.pointsalpha})`); 
-        strokeWeight(2);
-        line(this.get_pc().x-5,this.get_pc().y,this.get_pc().x+5,this.get_pc().y);
-        line(this.get_pc().x,this.get_pc().y-5,this.get_pc().x,this.get_pc().y+5);
+        if (p1){
+            line(this.x1-5,this.y1,this.x1+5,this.y1);
+            line(this.x1,this.y1-5,this.x1,this.y1+5);
+        }
+
+        if (p2) {
+            line(this.x2-5,this.y2,this.x2+5,this.y2);
+            line(this.x2,this.y2-5,this.x2,this.y2+5);
+        }
+
+       if (pc){
+            stroke(`rgba(0,191,255,${this.pointsalpha})`); 
+            strokeWeight(2);
+            line(this.get_pc().x-5,this.get_pc().y,this.get_pc().x+5,this.get_pc().y);
+            line(this.get_pc().x,this.get_pc().y-5,this.get_pc().x,this.get_pc().y+5);
+       }
+        
+    }
+
+    display(){
+
+         // DRAW LINE
+            stroke(`rgba(${this.c.r},${this.c.g},${this.c.b},${this.c.a})`); 
+            strokeWeight(this.e);
+            line(this.x1,this.y1,this.x2,this.y2);
+        
 
     }
 

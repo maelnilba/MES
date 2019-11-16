@@ -84,10 +84,51 @@
 }
 
 .directDcolor, .directScolor{
-    
-    width: 195px;
+    width: 95px;
     height: 20px;
+    position: absolute;
+    left: 4px;
 }
+
+.bf {
+  position: relative;
+  left: 20%;
+}
+
+
+input.switch{
+  position: relative;
+  -webkit-appearance: none;
+  left: 60px;
+  top: 0px;
+  outline: none;
+  width: 50px;
+  height: 20px;
+  background-color: rgb(77, 90, 104);
+  border: 1px solid #D9DADC;
+  border-radius: 50px;
+  box-shadow: inset -20px 0 0 0 #fff;
+}
+
+input.switch:after {
+  content: "";
+  position: absolute;
+  top: 1px; left: 1px;
+  width: 26px; height: 26px;
+  background-color: transparent;
+  border-radius: 50%; box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
+  }
+
+input.switch:checked {
+    border-color: #4e7486;
+    box-shadow: inset 20px 0 0 0 #4e7486;
+    }
+
+input.switch:checked:after {
+    left: 20px;
+    box-shadow: -2px 4px 3px rgba(0,0,0,0.05);
+  }
+
 
 .drwactbtndel, .drwactbtndup {
   margin-left: 15px;
