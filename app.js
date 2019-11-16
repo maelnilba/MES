@@ -10,6 +10,8 @@
 // CREATE FUNCTION WITH WIDTH AND HEIGHT FOR CREATE THE TFM BACKGROUND
 // MAKE P1 AND P2 POINTS VALUE CORDINATE WITH CARNIDAL 0,0 FROM TFM BACKGROUND
 
+// CREATE FOREGROUND AND BACKGROUND AND MAKE POINTS ALWAYS FOREGROUND
+
 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
@@ -369,8 +371,8 @@ function deletejoint() {
     if (isDrawing === false){
 
         let indexcompt = isEdit.selectindex;
-            while (indexcompt < joints.length){
-                joints[indexcompt] = joints[indexcompt+1];
+            while (indexcompt < index) {
+                copyjoint(indexcompt,indexcompt+1);
                 indexcompt++;
             }
         if (index > 0){
