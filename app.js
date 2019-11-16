@@ -4,7 +4,6 @@
 // MAKE NAVBAR AND SETTINGS PRETTY -- 90%
 
 
-// CREATE DELETE BUTTON AND DUPLICATE
 // CREATE Z VALUE MINUS AND PLUS
 
 
@@ -386,15 +385,19 @@ function deletejoint() {
 function duplicatejoint() {
     if (isDrawing === false){
         if (index > 0){
-          joints[index].set_p1(joints[isEdit.selectindex].x1+40,joints[isEdit.selectindex].y1);
-        joints[index].set_p2(joints[isEdit.selectindex].x2+40,joints[isEdit.selectindex].y2);
-        joints[index].set_color(joints[isEdit.selectindex].c.r,joints[isEdit.selectindex].c.g,joints[isEdit.selectindex].c.b);
-        joints[index].set_e(joints[isEdit.selectindex].e);
-        joints[index].set_alpha(joints[isEdit.selectindex].c.a);
+          copyjoint(index,isEdit.selectindex,40);
         index++;  
         }
         
     }
+}
+
+function copyjoint(ele, ele2,move_x = 0,move_y = 0){
+    joints[ele].set_p1(joints[ele2].x1+move_x,joints[ele2].y1+move_y);
+    joints[ele].set_p2(joints[ele2].x2+move_x,joints[ele2].y2+move_y);
+    joints[ele].set_color(joints[ele2].c.r,joints[ele2].c.g,joints[ele2].c.b);
+    joints[ele].set_e(joints[ele2].e);
+    joints[ele].set_alpha(joints[ele2].c.a);
 }
 
 
