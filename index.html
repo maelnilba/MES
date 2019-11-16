@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,101 +11,104 @@
     <script src="/jquery-minicolors/jquery.minicolors.js"></script>
     <link href="/jquery-minicolors/jquery.minicolors.css" rel="stylesheet" type="text/css" />
 
-
     <title>Drawing</title>
 </head>
+
 <body>
-    
-        <div id="menuToggle">
-                <input type="checkbox" id="show-draw-settings" /> <!-- CHECKBOX -->
-                <img src="icons/brushicon.png" alt="brushicon" id="brushlogo">
-            
-            
-            <nav class="draw-settings">
-                <!-- ALL SETTINGS ON THIS DIV -->
-                <ul>
-                    <li>
-                        <label>DEFAULT SETTINGS</label>
-                    </li>
-                    <li>
-                            <div class="directDcolor" id="directDcolor"></div>
-                    </li>
-                   <li class="colorpicker">
-                        <input  type="text" value="" name="defaultcolor" id="defaultcolor" /> <!-- MAX AND MIN LENGTH -->
-                   </li>
-                   <li class="item-color">
+
+    <div id="menuToggle">
+        <input type="checkbox" id="show-draw-settings" />
+        <!-- CHECKBOX -->
+        <img src="icons/brushicon.png" alt="brushicon" id="brushlogo">
+
+        <nav class="draw-settings">
+            <!-- ALL SETTINGS ON THIS DIV -->
+            <ul>
+                <li>
+                    <label>DEFAULT SETTINGS</label>
+                </li>
+                <li>
+                    <div class="directDcolor" id="directDcolor"></div>
+                </li>
+                <li class="colorpicker">
+                    <input type="text" value="" name="defaultcolor" id="defaultcolor">
+                    <!-- MAX AND MIN LENGTH -->
+                </li>
+                <li class="item-color">
                     <label for="defaultcolorval">C:&nbsp;</label>
-                     <input class="paramdrw" type="text" value="" id="defaultcolorval" />  
-                     <label for="defaultalphaval">A:&nbsp;</label>
-                     <input class="paramdrw" type="number" step="0.1" value="1" id="defaultalphaval" />
-                   </li>
-                   <li class="item-color">
-                        
-                   </li>
-                   <li class="item-color">
-                       <label class="thickness">Thickness : &nbsp;</label>
-                       <input type="range" id="defaulteval" min="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1" />
-                       <input type="text" id="defaultevalin" oninput="updateDefaulteSlider(this.value);" value="">
-                   </li>
-                   <li>
-                        <span class="line"></span>
-                    </li>
-                   <li>
+                    <input class="paramdrw" type="text" value="" id="defaultcolorval">
+                    <label for="defaultalphaval">A:&nbsp;</label>
+                    <input class="paramdrw" type="number" step="0.1" value="1" id="defaultalphaval">
+                </li>
+                <li class="item-color">
+
+                </li>
+                <li class="item-color">
+                    <label class="thickness">Thickness : &nbsp;</label>
+                    <input type="range" id="defaulteval" min="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1">
+                    <input type="text" id="defaultevalin" oninput="updateDefaulteSlider(this.value);" value="">
+                </li>
+                <li>
+                    <span class="linebold"></span>
+                </li>
+                <li>
                     <label>SELECTED SETTINGS</label>
                 </li>
                 <li>
-                        <div class="directScolor" id="directScolor"></div>
+                    <div class="directScolor" id="directScolor"></div>
                 </li>
-               <li class="colorpicker">
-                    <input  type="text" value="" name="selectcolor" id="selectcolor" /> <!-- MAX AND MIN LENGTH -->
-               </li>
-               <li class="item-color">
-                <label for="selectcolorval">C:&nbsp;</label>
-                 <input class="paramdrw" type="text" value="" id="selectcolorval" />  
-                 <label for="selectalphaval">A:&nbsp;</label>
-                 <input class="paramdrw" type="number" step="0.1" value="1" id="selectalphaval" />
-               </li>
-               <li class="item-color">
-                    
-               </li>
-               <li class="item-color">
-                   <label class="thickness">Thickness : &nbsp;</label>
-                   <input type="range" id="selecteval" min="1" max="260" oninput="updateSelecteInput(this.value);" value="2" step="1" />
-                   <input type="text" id="selectevalin" oninput="updateSelecteSlider(this.value);" value="">
-               </li>
-               <li class="item-color">
-                <label class="pinfo">P1 :</label>
-                <label>X &nbsp;</label>
-                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1x(this.value);" id="p1x" />
-                <label>&nbsp; Y &nbsp;</label>
-                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1y(this.value);" id="p1y" />
-               </li>
-               <li>
-                   <span class="line"></span>
-               </li>
-               <li class="item-color">
+                <li class="colorpicker">
+                    <input type="text" value="" name="selectcolor" id="selectcolor">
+                    <!-- MAX AND MIN LENGTH -->
+                </li>
+                <li class="item-color">
+                    <label for="selectcolorval">C:&nbsp;</label>
+                    <input class="paramdrw" type="text" value="" id="selectcolorval">
+                    <label for="selectalphaval">A:&nbsp;</label>
+                    <input class="paramdrw" type="number" step="0.1" value="1" id="selectalphaval">
+                </li>
+                <li class="item-color">
+
+                </li>
+                <li class="item-color">
+                    <label class="thickness">Thickness : &nbsp;</label>
+                    <input type="range" id="selecteval" min="1" max="260" oninput="updateSelecteInput(this.value);" value="2" step="1">
+                    <input type="text" id="selectevalin" oninput="updateSelecteSlider(this.value);" value="">
+                </li>
+                <li class="item-color">
+                    <label class="pinfo">P1 :</label>
+                    <label>X &nbsp;</label>
+                    <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1x(this.value);" id="p1x">
+                    <label>&nbsp; Y &nbsp;</label>
+                    <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP1y(this.value);" id="p1y">
+                </li>
+                <li>
+                    <span class="line"></span>
+                </li>
+                <li class="item-color">
                     <label class="pinfo">P2 :</label>
                     <label>X &nbsp;</label>
-                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2x(this.value);" id="p2x" />
-                <label>&nbsp; Y &nbsp;</label>
-                <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2y(this.value);" id="p2y" />
-               </li>
+                    <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2x(this.value);" id="p2x">
+                    <label>&nbsp; Y &nbsp;</label>
+                    <input class="paramdrwpts" type="number" step="1" value="" oninput="updateP2y(this.value);" id="p2y">
+                </li>
+                <li>
+                    <span class="linebold"></span>
+                </li>
+                <li>
+                    <input class="drwactbtndel" type="button" onclick="deletejoint();" value="Delete">
+                    <input class="drwactbtndup" type="button" onclick="duplicatejoint();" value="Duplicate">
+                </li>
+            </ul>
 
+        </nav>
 
+        <div class="navbar"></div>
+        <!-- THE NAVBAR DESIGN -->
+    </div>
 
-                </ul>
-
-              </nav>  
-            
-
-
-
-
-            <div class="navbar"></div> <!-- THE NAVBAR DESIGN -->
-        </div>       
-
-
-        <script src="p5.js"></script>
-        <script src="sketch.js"></script>
+    <script src="p5.js"></script>
+    <script src="sketch.js"></script>
 </body>
+
 </html>

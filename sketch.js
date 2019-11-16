@@ -161,6 +161,8 @@ function draw() {
             Editing(); // EDITING FUNCTION
 
    // console.log(); // FOR NOOB TESTING
+   console.log("index " +index, "selectid" + isEdit.selectindex);
+   
         
 
 }
@@ -208,14 +210,13 @@ function Drawing(){
         if (mouseIsPressed){
             
             if (locked === true && dragged === false && isDrawing === false){
-
+                    isEdit.selectindex = index;
                     joints[index].set_color(DefaultColor.r,DefaultColor.g,DefaultColor.b); // DEFAULT SETTER
                     joints[index].set_alpha(DefaultAlpha);
                     joints[index].set_e(DefaultE);
 
                     joints[index].set_p1(mspos.x,mspos.y);
                     joints[index].set_p2(mspos.x,mspos.y);
-                    joints[index].set_index(index)
                     isDrawing = true;
             }
             if (locked === true && dragged === true && isDrawing === true){
@@ -225,12 +226,11 @@ function Drawing(){
         }
 
         if (locked === false && dragged === false && isDrawing === true){
-                    isEdit.selectindex = index;
                     isDrawing = false;
                     index += 1;
 
                     // HISTORY COLORS SET
-                    updateSelecteInput(DefaultE);
+                    updateSelecteInput(DefaultE); // SYNC PARAM
                     updateSelecteSlider(DefaultE);
 
                     if (swatchesindex.z === 0){
@@ -278,21 +278,21 @@ function Cursoring() {
     // DETECT IF CURSOR ON A POINT
     if (isDrawing === false){
         for (let i = 0; i < index; i++){
-            if (((mouseX > (joints[i].get_p1().x)-5) && (mouseX < (joints[i].get_p1().x)+5)) &&  (mouseY > (joints[i].get_p1().y)-5) && (mouseY < (joints[i].get_p1().y)+5)){
+            if (((mouseX > (joints[i].get_p1().x)-10) && (mouseX < (joints[i].get_p1().x)+10)) &&  (mouseY > (joints[i].get_p1().y)-10) && (mouseY < (joints[i].get_p1().y)+10)){
                 Select.state = true;Select.p = 1;// P1 
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 1;
                 }
                 break;
             }
-            else if (((mouseX > (joints[i].get_p2().x)-5) && (mouseX < (joints[i].get_p2().x)+5)) &&  ((mouseY > (joints[i].get_p2().y)-5) && (mouseY < (joints[i].get_p2().y)+5))) {
+            else if (((mouseX > (joints[i].get_p2().x)-10) && (mouseX < (joints[i].get_p2().x)+10)) &&  ((mouseY > (joints[i].get_p2().y)-10) && (mouseY < (joints[i].get_p2().y)+10))) {
                 Select.state = true;Select.p = 2 // P2
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 2;
                 }
                 break;
             }
-            else if (((mouseX > (joints[i].get_pc().x)-5) && (mouseX < (joints[i].get_pc().x)+5)) &&  ((mouseY > (joints[i].get_pc().y)-5) && (mouseY < (joints[i].get_pc().y)+5))) {
+            else if (((mouseX > (joints[i].get_pc().x)-10) && (mouseX < (joints[i].get_pc().x)+10)) &&  ((mouseY > (joints[i].get_pc().y)-10) && (mouseY < (joints[i].get_pc().y)+10))) {
                 Select.state = true;Select.p = 12 // PCENTER
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 12;
@@ -366,6 +366,36 @@ function Editing(){
 }
 
 
+function deletejoint() {
+    if (isDrawing === false){
+
+        let indexcompt = isEdit.selectindex;
+            while (indexcompt < joints.length){
+                joints[indexcompt] = joints[indexcompt+1];
+                indexcompt++;
+            }
+        if (index > 0){
+           index--; 
+        }
+        if (index > 1){
+           isEdit.selectindex = index - 1; 
+        }   
+    }  
+}
+
+function duplicatejoint() {
+    if (isDrawing === false){
+        if (index > 0){
+          joints[index].set_p1(joints[isEdit.selectindex].x1+40,joints[isEdit.selectindex].y1);
+        joints[index].set_p2(joints[isEdit.selectindex].x2+40,joints[isEdit.selectindex].y2);
+        joints[index].set_color(joints[isEdit.selectindex].c.r,joints[isEdit.selectindex].c.g,joints[isEdit.selectindex].c.b);
+        joints[index].set_e(joints[isEdit.selectindex].e);
+        joints[index].set_alpha(joints[isEdit.selectindex].c.a);
+        index++;  
+        }
+        
+    }
+}
 
 
 // COLOR FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
@@ -460,13 +490,12 @@ function updateP2y(val){
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 
   class Joints{
-    constructor(){
-        this.x1 = 0; this.y1 = 0;
-        this.x2 = 0; this.y2 = 0;
-        this.c = {r:0,g:0,b:0,a:1};
-        this.e = 10;
-        this.z = -1;
-        this.pointsalpha = 0.75;
+    constructor(x1 = 0, y1 = 0, x2 = 0, y2 = 0, c = {r:0,g:0,b:0,a:1}, e = 10, pointsalpha = 0.75){
+        this.x1 = x1; this.y1 = y1;
+        this.x2 = x2; this.y2 = y2;
+        this.c = c;
+        this.e = e;
+        this.pointsalpha = pointsalpha;
     }
 
     set_p1(x,y){
@@ -487,14 +516,6 @@ function updateP2y(val){
 
     get_pc(){
         return {x:(this.x1+this.x2)/2,y:(this.y1+this.y2)/2};
-    }
-    
-    set_index(index){
-        this.z = index;
-    }
-
-    get_index(){
-        return this.z;
     }
 
     set_pointsalpha(alpha){
