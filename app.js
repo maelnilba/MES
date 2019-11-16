@@ -1,22 +1,15 @@
 // TODO -------------------
-// ADDING NAVBAR WITH PROPERTIES -- 90%
-// MAKE PROPERTIES WORK -- 80%
-// MAKE NAVBAR AND SETTINGS PRETTY -- 90%
-
-
-// CREATE Z VALUE MINUS AND PLUS
-
-
-// CREATE FUNCTION WITH WIDTH AND HEIGHT FOR CREATE THE TFM BACKGROUND
-// MAKE P1 AND P2 POINTS VALUE CORDINATE WITH CARNIDAL 0,0 FROM TFM BACKGROUND
 
 // CREATE FOREGROUND AND BACKGROUND AND MAKE POINTS ALWAYS FOREGROUND
 
 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
-let joints = []
-let SpaceNotAllowed = 50;
+var joints = []
+var SpaceNotAllowed = 50;
+let tfmbg_width = 800;
+let tfmbg_height = 400;
+let cardinal = {x:Math.round(window.innerWidth/2-400), y:Math.round(window.innerHeight/2-200)};
 
 // MAIN -------------------------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +17,8 @@ let SpaceNotAllowed = 50;
 function setup(){
     createCanvas(window.innerWidth, window.innerHeight); // BG
     background(106,116,149); // BG COLOR
-    for (let i = 0; i < 1000; i++) { // CREATE 1000 POSSIBLE LINE, MIGHT CHANGE THIS
+    bgcolor = color(106,116,149);
+    for (let i = 0; i < 2000; i++) { // CREATE 1000 POSSIBLE LINE, MIGHT CHANGE THIS
         joints.push(new Joints());
               }
 
@@ -56,6 +50,7 @@ $('#selectcolor').minicolors('value','324650');
 
 function draw() {
     background(106,116,149); // RESET BG EVERYTIME
+    displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
     for (let i = 0; i < index; i++){
         if (i === isEdit.selectindex){
             joints[i].set_pointsalpha(1);
@@ -65,7 +60,57 @@ function draw() {
             }
              joints[i].display();
     } // DISPLAY ALL JOINTS CREATED
-       
+ 
+
+    // MAIN
+    SyncSettingsDOM() // SYNCHRONIZE SETTINGS FOR DRAWING
+        Cursoring(); // CURSOR FUNCTION
+            Drawing(); // DRAWING FUNCTION 
+                Editing(); // EDITING FUNCTION
+
+   // console.log(); // FOR NOOB TESTING
+        
+
+}
+     
+
+// MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
+
+function mousePressed() {
+
+    if (document.getElementById("show-draw-settings").checked) {
+        SpaceNotAllowed = 250;
+    }
+    else {
+        SpaceNotAllowed = 50;
+    }
+
+    if (mouseX > SpaceNotAllowed) { // CANNOT DRAW IF MOUSE ON PARAMETERS
+        locked = true;
+    }
+    else {
+        locked = false;
+    }
+        mspos = {x:mouseX,y:mouseY}   
+  } 
+
+function mouseDragged(){
+        if (locked){         
+          
+            mspos = {x:mouseX,y:mouseY};
+            dragged = true;
+            
+        }
+}
+function mouseReleased() {     
+    
+        mspos = {x:mouseX,y:mouseY};
+        locked = false;
+        dragged = false;
+  }
+
+// FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
+function SyncSettingsDOM(){
     // PROPERTIES SETTINGS  
 
     // DEFAULT
@@ -137,78 +182,24 @@ function draw() {
     // P1 AND P2 SETTINGS
 
     if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) { 
-        document.getElementById('p1x').value = joints[isEdit.selectindex].get_p1().x;
+        document.getElementById('p1x').value = joints[isEdit.selectindex].get_p1().x-cardinal.x;
     }
     
     if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) { 
-        document.getElementById('p1y').value = joints[isEdit.selectindex].get_p1().y;
+        document.getElementById('p1y').value = joints[isEdit.selectindex].get_p1().y-cardinal.y;
     }
 
     if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) { 
-        document.getElementById('p2x').value = joints[isEdit.selectindex].get_p2().x;
+        document.getElementById('p2x').value = joints[isEdit.selectindex].get_p2().x-cardinal.x;
     }
 
     if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) { 
-        document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y;
+        document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y-cardinal.y;
     }
 
     document.getElementById('selectindex').value = Number(isEdit.selectindex);  
 
-    
-    
-
-    
-
-
-    // MAIN
-
-    Cursoring(); // CURSOR FUNCTION
-        Drawing(); // DRAWING FUNCTION 
-            Editing(); // EDITING FUNCTION
-
-   // console.log(); // FOR NOOB TESTING
-        
-
 }
-     
-
-// MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
-
-function mousePressed() {
-
-    if (document.getElementById("show-draw-settings").checked) {
-        SpaceNotAllowed = 250;
-    }
-    else {
-        SpaceNotAllowed = 50;
-    }
-
-    if (mouseX > SpaceNotAllowed) { // CANNOT DRAW IF MOUSE ON PARAMETERS
-        locked = true;
-    }
-    else {
-        locked = false;
-    }
-        mspos = {x:mouseX,y:mouseY}   
-  } 
-
-function mouseDragged(){
-        if (locked){         
-          
-            mspos = {x:mouseX,y:mouseY};
-            dragged = true;
-            
-        }
-}
-function mouseReleased() {     
-    
-        mspos = {x:mouseX,y:mouseY};
-        locked = false;
-        dragged = false;
-  }
-
-// FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
-
 function Drawing(){
     if (Select.state === false){
         if (mouseIsPressed){
@@ -391,6 +382,7 @@ function duplicatejoint() {
     if (isDrawing === false){
         if (index > 0){
           copyjoint(joints[index],joints[isEdit.selectindex],40);
+          isEdit.selectindex = index;
         index++;  
         }
         
@@ -453,6 +445,19 @@ function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
   }
 
+function displaytfmbg(width, height, visible = true){
+    if (visible){
+        stroke('#878FAA');
+        strokeWeight(5);
+        fill(bgcolor);
+        rect(window.innerWidth/2-400,window.innerHeight/2-200,width,height);
+        fill('#878FAA');
+        rect(window.innerWidth/2-400,window.innerHeight/2-200,width,20)
+        fill('#878FAA');
+        rect(window.innerWidth/2-400,window.innerHeight/2+200,width,200)  
+    }
+    
+}
 
 // DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -502,19 +507,19 @@ function windowResized() {
 
   // P1 
 function updateP1x(val){
-    joints[isEdit.selectindex].x1 = Number(val);
+    joints[isEdit.selectindex].x1 = Number(val)+cardinal.x;
 }
 
 function updateP1y(val){
-    joints[isEdit.selectindex].y1 = Number(val);
+    joints[isEdit.selectindex].y1 = Number(val)+cardinal.y;
 }
 
 function updateP2x(val){
-    joints[isEdit.selectindex].x2 = Number(val);
+    joints[isEdit.selectindex].x2 = Number(val)+cardinal.x;
 }
 
 function updateP2y(val){
-    joints[isEdit.selectindex].y2 = Number(val);
+    joints[isEdit.selectindex].y2 = Number(val)+cardinal.y;
 }
   // P2
 
