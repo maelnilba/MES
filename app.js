@@ -18,6 +18,8 @@ function setup(){
     for (let i = 0; i < 2000; i++) { // CREATE 1000 POSSIBLE LINE, MIGHT CHANGE THIS
         joints.push(new Joints());
               }
+    background(106,116,149); // 
+    displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
 
 index = 0; // Z VALUE
 locked = false;dragged = false; // VAR MOUSEACTIONS
@@ -48,43 +50,18 @@ $('#selectcolor').minicolors('value','324650');
 // DRAW -------------------------------------------------------------------------------------------------------------------------------------
 
 function draw() {
-    background(106,116,149); // RESET BG EVERYTIME
-    displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
-
-
-    for (let i = 0; i < index; i++){
-        if (joints[i].foreground === false){
-                joints[i].display();
-        }
-
-    } 
-
-    for (let i = 0; i < index; i++){
-        if (joints[i].foreground === true){
-                joints[i].display();
-        }
-
-    } 
-
-
-    for (let i = 0; i < index; i++){
-
-        if (i === isEdit.selectindex){
-            joints[i].set_pointsalpha(1);
-            }
-        if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
-             joints[i].set_pointsalpha(0.75);
-            }
-            joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
-    }
-    // DISPLAY ALL JOINTS CREATED
+    
  
 
     // MAIN
-    SyncSettingsDOM() // SYNCHRONIZE SETTINGS FOR DRAWING
-        Cursoring(); // CURSOR FUNCTION
-            Drawing(); // DRAWING FUNCTION 
-                Editing(); // EDITING FUNCTION
+    if (document.getElementById('show-draw-settings').checked){ // IF USERS OPEN DRAW EDITOR
+          DisplayJoints(); // DISPLAY ALL JOINTS
+            SyncSettingsDOM(); // SYNCHRONIZE SETTINGS FOR DRAWING
+                Cursoring(); // CURSOR FUNCTION
+                    Drawing(); // DRAWING FUNCTION 
+                        Editing(); // EDITING FUNCTION
+    }
+  
 
    // console.log(); // FOR NOOB TESTING
         
@@ -128,6 +105,41 @@ function mouseReleased() {
   }
 
 // FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
+function DisplayJoints(){
+    background(106,116,149); // RESET BG EVERYTIME
+    displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
+
+
+    for (let i = 0; i < index; i++){
+        if (joints[i].foreground === false){
+                joints[i].display();
+        }
+
+    } 
+
+    for (let i = 0; i < index; i++){
+        if (joints[i].foreground === true){
+                joints[i].display();
+        }
+
+    } 
+
+
+    for (let i = 0; i < index; i++){
+
+        if (i === isEdit.selectindex){
+            joints[i].set_pointsalpha(1);
+            }
+        if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
+             joints[i].set_pointsalpha(0.75);
+            }
+            joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
+    }
+    // DISPLAY ALL JOINTS CREATED
+}
+
+
+
 function SyncSettingsDOM(){
     // PROPERTIES SETTINGS  
 
@@ -496,6 +508,8 @@ function hexToRgb(hex) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    background(106,116,149); // 
+    displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
   }
 
 function displaytfmbg(width, height, visible = true){
