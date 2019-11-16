@@ -127,9 +127,33 @@
   outline:none;
 }
 
-.drwactbtndel:focus, .drwactbtndup:focus {
+.drwactbtndel:focus, .drwactbtndup:focus, .minusbtn:focus, .plusbtn:focus {
   outline:none;
 }
+
+.selectindex{
+  width: 30px;
+  text-align: right;
+}
+
+.minusbtn, .plusbtn{
+  background-color: rgb(229, 235, 241);
+  text-decoration: none;
+  border: none;
+  width: 30px;
+}
+
+.minusbtn:hover, .plusbtn:hover{
+  background-color: rgb(160, 207, 255);
+  border: none;
+}
+
+.minusbtn:active, .plusbtn:active{
+  background-color: #4e7486;
+  border:none;
+  outline:none,
+}
+
 
 #defaulteval, #selecteval {
     width: 90px;

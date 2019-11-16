@@ -152,6 +152,11 @@ function draw() {
         document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y;
     }
 
+    document.getElementById('selectindex').value = Number(isEdit.selectindex);  
+
+    
+    
+
     
 
 
@@ -162,8 +167,6 @@ function draw() {
             Editing(); // EDITING FUNCTION
 
    // console.log(); // FOR NOOB TESTING
-   console.log("index " +index, "selectid" + isEdit.selectindex);
-   
         
 
 }
@@ -372,7 +375,7 @@ function deletejoint() {
 
         let indexcompt = isEdit.selectindex;
             while (indexcompt < index) {
-                copyjoint(indexcompt,indexcompt+1);
+                copyjoint(joints[indexcompt],joints[indexcompt+1]);
                 indexcompt++;
             }
         if (index > 0){
@@ -387,19 +390,45 @@ function deletejoint() {
 function duplicatejoint() {
     if (isDrawing === false){
         if (index > 0){
-          copyjoint(index,isEdit.selectindex,40);
+          copyjoint(joints[index],joints[isEdit.selectindex],40);
         index++;  
         }
         
     }
 }
 
+
+function zplus() {
+    if (isDrawing === false){
+        if ((isEdit.selectindex >= 0) && (isEdit.selectindex < index - 1)){
+            let save = new Joints();
+            copyjoint(save,joints[isEdit.selectindex+1]);
+            copyjoint(joints[isEdit.selectindex+1],joints[isEdit.selectindex]);
+            copyjoint(joints[isEdit.selectindex],save);
+            isEdit.selectindex++;
+        }
+        
+    }
+}
+
+function zminus(){
+    if (isDrawing === false){
+        if ((isEdit.selectindex > 0) && (isEdit.selectindex < index )){
+            let save = new Joints();
+            copyjoint(save,joints[isEdit.selectindex-1]);
+            copyjoint(joints[isEdit.selectindex-1],joints[isEdit.selectindex]);
+            copyjoint(joints[isEdit.selectindex],save);
+            isEdit.selectindex--;
+        }
+    }
+}
+
 function copyjoint(ele, ele2,move_x = 0,move_y = 0){
-    joints[ele].set_p1(joints[ele2].x1+move_x,joints[ele2].y1+move_y);
-    joints[ele].set_p2(joints[ele2].x2+move_x,joints[ele2].y2+move_y);
-    joints[ele].set_color(joints[ele2].c.r,joints[ele2].c.g,joints[ele2].c.b);
-    joints[ele].set_e(joints[ele2].e);
-    joints[ele].set_alpha(joints[ele2].c.a);
+        ele.set_p1(ele2.x1+move_x,ele2.y1+move_y);
+        ele.set_p2(ele2.x2+move_x,ele2.y2+move_y);
+        ele.set_color(ele2.c.r,ele2.c.g,ele2.c.b);
+        ele.set_e(ele2.e);
+        ele.set_alpha(ele2.c.a);
 }
 
 
