@@ -67,7 +67,22 @@ function draw() {
         
 
 }
-     
+    
+
+
+function keyTyped(){
+    if (isEdit.state === false){
+        if ((key === 'd') || (key === 'D')){
+            deletejoint();
+        }
+
+        if ((key === 'c') || (key === 'C')){
+            duplicatejoint();
+        }     
+    }
+    
+
+}
 
 // MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
@@ -423,9 +438,11 @@ function deletejoint() {
         if (index > 0){
            index--; 
         }
-        if (index > 1){
+        if (index >= 1){
            isEdit.selectindex = index - 1; 
         }   
+
+        Select.state = false;
     }  
 }
 
@@ -436,6 +453,8 @@ function duplicatejoint() {
           isEdit.selectindex = index;
         index++;  
         }
+
+        Select.state = false;
         
     }
 }
@@ -472,20 +491,6 @@ function copyjoint(ele, ele2,move_x = 0,move_y = 0){
         ele.set_color(ele2.c.r,ele2.c.g,ele2.c.b);
         ele.set_e(ele2.e);
         ele.set_alpha(ele2.c.a);
-}
-
-function updatebf(){
-    if (Defaultfb === false){
-        Defaultfb = true;
-    }
-    else if (Defaultfb === true){
-        Defaultfb = false;
-    }
-}
-
-function updatesbf(){
-    let state = document.getElementById('selectbf').checked;
-    joints[isEdit.selectindex].set_foreground(state);
 }
 
 
@@ -588,7 +593,23 @@ function updateP2x(val){
 function updateP2y(val){
     joints[isEdit.selectindex].y2 = Number(val)+cardinal.y;
 }
-  // P2
+
+function updatebf(){
+    if (Defaultfb === false){
+        Defaultfb = true;
+    }
+    else if (Defaultfb === true){
+        Defaultfb = false;
+    }
+}
+
+function updatesbf(){
+    let state = document.getElementById('selectbf').checked;
+    joints[isEdit.selectindex].set_foreground(state);
+}
+
+
+
 
 
 
