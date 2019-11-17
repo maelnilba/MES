@@ -2,7 +2,6 @@
 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
-var joints = [];
 var layouts = [];
 var SpaceNotAllowed = 50;
 let tfmbg_width = 800;
@@ -212,32 +211,37 @@ function DisplayJoints(showpts = true) {
 	background(106, 116, 149); // RESET BG EVERYTIME
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
 
+    for (let c = 0; c < layouts.length; c++){
+        for (let i = 0; i < index; i++) {
+            if (layouts[c].layout[i].foreground === false) {
+                layouts[c].layout[i].display();
+            }
 
-	for (let i = 0; i < index; i++) {
-		if (layouts[current_layout].layout[i].foreground === false) {
-			layouts[current_layout].layout[i].display();
-		}
+        }
 
-	}
+        for (let i = 0; i < index; i++) {
+            if (layouts[c].layout[i].foreground === true) {
+                layouts[c].layout[i].display();
+            }
 
-	for (let i = 0; i < index; i++) {
-		if (layouts[current_layout].layout[i].foreground === true) {
-			layouts[current_layout].layout[i].display();
-		}
-
-	}
+        }
+    }
+	
 
 	if (showpts) {
-		for (let i = 0; i < index; i++) {
+        for (let c = 0; c < layouts.length; c++){
+            for (let i = 0; i < index; i++) {
 
-			if (i === isEdit.selectindex) {
-				layouts[current_layout].layout[i].set_pointsalpha(1);
-			}
-			if ((layouts[current_layout].layout[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)) {
-				layouts[current_layout].layout[i].set_pointsalpha(0.75);
-			}
-			layouts[current_layout].layout[i].displaypoints(showpoints.p1, showpoints.p2, showpoints.pc);
-		}
+                if (i === isEdit.selectindex) {
+                    layouts[c].layout[i].set_pointsalpha(1);
+                }
+                if ((layouts[c].layout[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)) {
+                    layouts[c].layout[i].set_pointsalpha(0.75);
+                }
+                layouts[c].layout[i].displaypoints(showpoints.p1, showpoints.p2, showpoints.pc);
+            } 
+        }
+		
 	}
 
 	// DISPLAY ALL JOINTS CREATED
