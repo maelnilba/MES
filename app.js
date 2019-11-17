@@ -207,6 +207,7 @@ function mouseReleased() {
 }
 
 // DRAW EDITOR FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
+
 function DisplayJoints(showpts = true) {
 	background(106, 116, 149); // RESET BG EVERYTIME
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
@@ -715,7 +716,6 @@ function updatesbf() {
 
 // XML FUNCTIONS -----------------------------------------------------------------------------------------------------------------------------------
 // <C><P /><Z><S /><D /><O /><L><JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/></L></Z></C>
-// layouts[current_layout].layout
 function savexml() {
 	let XML = "";
 	XML += '<C><P /><Z><S /><D /><O /><L>';
@@ -744,11 +744,6 @@ function loadxml() {
 	let JD;
 	if (XML.startsWith('<C><P')) {
 
-		/* 
-		for (i = 0; i <= index;i++){ // CLEAR THE CURRENT ARRAY
-		    joints[i] = new Joints();
-		} 
-		index = 0; */ // GONNA ADD A CLEAR FUNCTION
 
 
 		XML = XML.substring(
@@ -828,8 +823,9 @@ function loadxml() {
 
 		} // END FOR
 
+        isEdit.selectindex = XML.length+index-1;
 		index = XML.length+index;
-		isEdit.selectindex = XML.length+index;
+		
 
 
 		// DISPLAY EXCEPT POINTS
@@ -975,7 +971,8 @@ class Joints {
 
 }
 
-class Layouts {
+// LAYOUTS IS AN ARRAY OF LAYOUTS() AND LAYOUTS HAS AN ARRAY OF JOINTS() AS LAYOUT
+class Layouts { // layouts[current_layout].layout[value]
 	constructor() {
 		this.layout = [];
 		this.type;
@@ -983,7 +980,7 @@ class Layouts {
 
 	}
 
-	create_layout(type = "jts") {
+	create_layout(type = "jts") { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
 		for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
 			this.layout.push(new Joints());
 		}
