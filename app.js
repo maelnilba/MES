@@ -1,5 +1,6 @@
 // TODO -------------------
-
+// LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y 
+// DRAG AND ZOOM 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
@@ -15,7 +16,7 @@ let cardinal = {
 
 // SETUP -------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
-	createCanvas(window.innerWidth, window.innerHeight); // BG
+    drawcanvas = createCanvas(windowWidth, windowHeight); // BG
 	background(106, 116, 149); // BG COLOR
 	bgcolor = color(106, 116, 149);
 	current_layout = 0;
@@ -24,10 +25,6 @@ function setup() {
 	layouts.push(new Layouts());
 	layouts[current_layout].create_layout();
 
-	/* for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
-	    joints.push(new Joints());
-	          } */
-	// avant : joints[] -- layouts[current_layout].layout[]
 
 
 	background(106, 116, 149); // 
@@ -118,7 +115,16 @@ function setup() {
 		format: 'hex',
 		swatches: swatchescolor
 	}); // CREATE COLOR SCHEME FOR DEFAULT
-	$('#selectcolor').minicolors('value', '324650');
+    $('#selectcolor').minicolors('value', '324650');
+    
+    dragspace = {
+        key: false,
+        lock:false,
+        x:0,
+        y:0,
+        carx:0,
+        cary:0
+    };
 
 }
 
@@ -131,10 +137,11 @@ function draw() {
 	// MAIN
 	if (document.getElementById('show-draw-settings').checked) { // IF USERS OPEN DRAW EDITOR
 		DisplayJoints(); // DISPLAY ALL JOINTS
-		SyncSettingsDOM(); // SYNCHRONIZE SETTINGS FOR DRAWING
+        SyncSettingsDOM(); // SYNCHRONIZE SETTINGS FOR DRAWING
 		Cursoring(); // CURSOR FUNCTION
 		Drawing(); // DRAWING FUNCTION 
-		Editing(); // EDITING FUNCTION
+        Editing(); // EDITING FUNCTION
+        DragZoom(); // DRAG CAMERA AND ZOOM FUNCTION
 	} else {
 		DisplayJoints(false);
 	}
@@ -142,12 +149,12 @@ function draw() {
 
 	// console.log(); // FOR NOOB TESTING
 
-
+    
+        
+    
 }
 
 // KEY FUNCTIONS -------------------------------------------------------------------------------------------------------------------------------------
-
-
 function keyTyped() {
 	if (isEdit.state === false) {
 		if ((key === 'd') || (key === 'D')) {
@@ -156,11 +163,34 @@ function keyTyped() {
 
 		if ((key === 'c') || (key === 'C')) {
 			duplicatejoint();
-		}
+        }
+        if (key === ' '){
+            dragspace.key = true;
+        }
 	}
+}
 
+function keyReleased(){
+
+    if (dragspace.key === true){ // DRAG CAMERA
+        dragspace.key = false;
+        dragspace.lock = false;
+        if (locked === false){
+           Select.state = false; 
+        }
+        
+
+        for (let c = 0; c < layouts.length; c++){
+            for (let i = 0; i < layouts[c].index; i++){
+                layouts[c].layout[i].endmoving();
+            }
+        }  
+    }
 
 }
+
+
+
 
 // MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
@@ -171,12 +201,12 @@ function mousePressed() {
 	} else {
 		SpaceNotAllowed = 50;
 	}
-
+  
 	if (mouseX > SpaceNotAllowed) { // CANNOT DRAW IF MOUSE ON PARAMETERS
 		locked = true;
 	} else {
 		locked = false;
-	}
+    } 
 	mspos = {
 		x: mouseX,
 		y: mouseY
@@ -196,7 +226,9 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-
+    if (dragspace.lock === true){
+        dragspace.lock = false;
+    }
 	mspos = {
 		x: mouseX,
 		y: mouseY
@@ -207,6 +239,38 @@ function mouseReleased() {
 
 // DRAW EDITOR FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
+function DragZoom(){
+    if ((dragspace.key === true) && dragged === true){ // DRAG CAMERA
+
+        Select.state = true; 
+        if (dragspace.lock === false){
+            dragspace.x = mouseX;
+            dragspace.y = mouseY;
+            dragspace.carx = cardinal.x;
+            dragspace.cary = cardinal.y;
+            dragspace.lock = true;
+            for (let c = 0; c < layouts.length; c++){
+                for (let i = 0; i < layouts[c].index; i++){
+                    layouts[c].layout[i].endmoving();
+                }
+            }
+
+            }
+
+            for (let c = 0; c < layouts.length; c++){
+                for (let i = 0; i < layouts[c].index; i++){
+                    layouts[c].layout[i].moving(dragspace.x,dragspace.y);
+                }
+            }
+
+            cardinal.x = dragspace.carx - (dragspace.x - mspos.x);
+            cardinal.y = dragspace.cary - (dragspace.y - mspos.y);
+             
+                 
+    }
+
+    // TODO ZOOM 
+}
 function DisplayJoints(showpts = true) {
 	background(106, 116, 149); // RESET BG EVERYTIME
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
@@ -336,7 +400,7 @@ function SyncSettingsDOM() {
 }
 
 function Drawing() {
-	if (Select.state === false) {
+	if ((Select.state === false) && (dragspace.key === false)) {
 		if (mouseIsPressed) {
 
 			if (locked === true && dragged === false && isDrawing === false) {
@@ -617,11 +681,11 @@ function displaytfmbg(width, height, visible = true) {
 		stroke('#878FAA');
 		strokeWeight(5);
 		fill(bgcolor);
-		rect(window.innerWidth / 2 - 400, window.innerHeight / 2 - height / 2, width, height);
+		rect(cardinal.x, cardinal.y +200 - height / 2, width, height);
 		fill('#878FAA');
-		rect(window.innerWidth / 2 - 400, window.innerHeight / 2 - height / 2, width, 20)
+		rect(cardinal.x, cardinal.y +200 - height / 2, width, 20)
 		fill('#878FAA');
-		rect(window.innerWidth / 2 - 400, window.innerHeight / 2 + height / 2, width, 200)
+		rect(cardinal.x, cardinal.y + 200 + height / 2, width, 200)
 	}
 
 }
@@ -873,7 +937,8 @@ class Joints {
 		this.c = c;
 		this.e = e;
 		this.pointsalpha = pointsalpha;
-		this.foreground = foreground;
+        this.foreground = foreground;
+        this.move = {x1:0,x2:0,y1:0,y2:0,cx:0,cy:0,lock:false};
 
 	}
 
@@ -906,7 +971,24 @@ class Joints {
 			x: (this.x1 + this.x2) / 2,
 			y: (this.y1 + this.y2) / 2
 		};
-	}
+    }
+    
+    moving(drx = 0,dry = 0){
+
+        if (this.move.lock === false){
+            this.move.x1 = this.x1; this.move.x2 = this.x2; this.move.y1 = this.y1;this.move.y2 = this.y2;this.move.cx = this.get_pc().x;this.move.cy = this.get_pc().y;
+            
+            this.move.lock = true;
+        }
+        this.x1 = this.move.x1 - (drx - mouseX);
+        this.x2 = this.move.x2 - (drx - mouseX);
+        this.y1 = this.move.y1 - (dry - mouseY);
+        this.y2 = this.move.y2 - (dry - mouseY);
+    }
+
+    endmoving(){
+        this.move.lock = false;
+    }
 
 	set_pointsalpha(alpha) {
 		this.pointsalpha = alpha;
