@@ -1,6 +1,6 @@
 // TODO -------------------
-// LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y 
-// DRAG AND ZOOM 
+// LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y  AND VISUAL SETTINGS
+// ZOOM 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
@@ -11,6 +11,11 @@ let cardinal = {
 	x: Math.round(window.innerWidth / 2 - 400),
 	y: Math.round(window.innerHeight / 2 - 200)
 };
+
+const originalcardinal = {
+	x: Math.round(window.innerWidth / 2 - 400),
+	y: Math.round(window.innerHeight / 2 - 200)
+}; // FOR SET BACK POSITION
 
 // MAIN -------------------------------------------------------------------------------------------------------------------------------------
 
@@ -125,7 +130,6 @@ function setup() {
         carx:0,
         cary:0
     };
-
 }
 
 
@@ -156,7 +160,7 @@ function draw() {
 
 // KEY FUNCTIONS -------------------------------------------------------------------------------------------------------------------------------------
 function keyTyped() {
-	if (isEdit.state === false) {
+	if (isEdit.state === false && isDrawing === false) {
 		if ((key === 'd') || (key === 'D')) {
 			deletejoint();
 		}
@@ -166,6 +170,9 @@ function keyTyped() {
         }
         if (key === ' '){
             dragspace.key = true;
+        }
+        if ((key === 'r') || (key === 'R')){
+            resetpos();
         }
 	}
 }
@@ -240,7 +247,7 @@ function mouseReleased() {
 // DRAW EDITOR FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
 function DragZoom(){
-    if ((dragspace.key === true) && dragged === true){ // DRAG CAMERA
+    if (dragspace.key === true && dragged === true && isDrawing === false){ // DRAG CAMERA
 
         Select.state = true; 
         if (dragspace.lock === false){
@@ -652,6 +659,19 @@ function copyjoint(ele, ele2, move_x = 0, move_y = 0) {
 	ele.set_alpha(ele2.c.a);
 }
 
+function resetpos(){ // DETERMINE THE DISTANCE BETWEEN THE ACTUAL CARDINAL AND THE ORIGINAL AND APPLY THE DISTANCE TO COME BACK, should edit with resize canvas the original one
+    let dist = {x:cardinal.x - originalcardinal.x ,y:cardinal.y - originalcardinal.y};
+    console.log(originalcardinal, cardinal, dist);
+    cardinal.x = cardinal.x - dist.x;
+    cardinal.y = cardinal.y - dist.y;
+
+    for (let c = 0; c < layouts.length; c++){
+        for (let i = 0; i < layouts[c].index; i++){
+            layouts[c].layout[i].moveby(-dist.x,-dist.y);
+        }
+    }
+}
+
 
 // COLOR FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -971,6 +991,11 @@ class Joints {
 			x: (this.x1 + this.x2) / 2,
 			y: (this.y1 + this.y2) / 2
 		};
+    }
+
+    moveby(x,y){
+        this.x1 += x; this.x2 += x;
+        this.y1 += y; this.y2 += y;
     }
     
     moving(drx = 0,dry = 0){
