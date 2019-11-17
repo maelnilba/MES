@@ -843,6 +843,23 @@ function loadxml() {
 
 }
 
+function clearAll(){
+    if (confirm("Are you sure to delete all ?")){
+        index = 0;
+
+        for (let c = 0; c < layouts.length; c++){
+            for (let i = 0; i < layouts[c].length; i++){
+                layouts[c].layout[i] = new Joints();
+            }
+
+            while (layouts.lenght > 1){
+                layouts.pop();
+            }
+        } 
+    }
+    
+}
+
 
 // CLASS -------------------------------------------------------------------------------------------------------------------------------------------
 
