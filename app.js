@@ -147,6 +147,8 @@ function draw() {
 
 }
 
+// KEY FUNCTIONS -------------------------------------------------------------------------------------------------------------------------------------
+
 
 function keyTyped() {
 	if (isEdit.state === false) {
@@ -811,19 +813,19 @@ function loadxml() {
 					ptparam.foreground = false;
 				}
 
-				layouts[current_layout].layout[i].set_p1(pt1.x + cardinal.x, pt1.y + cardinal.y);
-				layouts[current_layout].layout[i].set_p2(pt2.x + cardinal.x, pt2.y + cardinal.y);
-				layouts[current_layout].layout[i].set_color(ptcolor.r, ptcolor.g, ptcolor.b);
-				layouts[current_layout].layout[i].set_e(ptparam.e);
-				layouts[current_layout].layout[i].set_alpha(ptparam.a);
-				layouts[current_layout].layout[i].set_foreground(ptparam.foreground);
+				layouts[current_layout].layout[i+index].set_p1(pt1.x + cardinal.x, pt1.y + cardinal.y);
+				layouts[current_layout].layout[i+index].set_p2(pt2.x + cardinal.x, pt2.y + cardinal.y);
+				layouts[current_layout].layout[i+index].set_color(ptcolor.r, ptcolor.g, ptcolor.b);
+				layouts[current_layout].layout[i+index].set_e(ptparam.e);
+				layouts[current_layout].layout[i+index].set_alpha(ptparam.a);
+				layouts[current_layout].layout[i+index].set_foreground(ptparam.foreground);
 
 			} // END IF
 
 		} // END FOR
 
-		index = XML.length;
-		isEdit.selectindex = XML.length;
+		index = XML.length+index;
+		isEdit.selectindex = XML.length+index;
 
 
 		// DISPLAY EXCEPT POINTS
