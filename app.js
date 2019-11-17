@@ -61,6 +61,9 @@ function draw() {
                     Drawing(); // DRAWING FUNCTION 
                         Editing(); // EDITING FUNCTION
     }
+    else {
+        DisplayJoints(false);
+    }
   
 
    // console.log(); // FOR NOOB TESTING
@@ -120,7 +123,7 @@ function mouseReleased() {
   }
 
 // DRAW EDITOR FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
-function DisplayJoints(){
+function DisplayJoints(showpts = true){
     background(106,116,149); // RESET BG EVERYTIME
     displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
 
@@ -139,17 +142,19 @@ function DisplayJoints(){
 
     } 
 
+    if (showpts){
+        for (let i = 0; i < index; i++){
 
-    for (let i = 0; i < index; i++){
-
-        if (i === isEdit.selectindex){
-            joints[i].set_pointsalpha(1);
-            }
-        if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
-             joints[i].set_pointsalpha(0.75);
-            }
-            joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
+            if (i === isEdit.selectindex){
+                joints[i].set_pointsalpha(1);
+                }
+            if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
+                joints[i].set_pointsalpha(0.75);
+                }
+                joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
+        }  
     }
+    
     // DISPLAY ALL JOINTS CREATED
 }
 
@@ -521,11 +526,11 @@ function displaytfmbg(width, height, visible = true){
         stroke('#878FAA');
         strokeWeight(5);
         fill(bgcolor);
-        rect(window.innerWidth/2-400,window.innerHeight/2-200,width,height);
+        rect(window.innerWidth/2-400,window.innerHeight/2-height/2,width,height);
         fill('#878FAA');
-        rect(window.innerWidth/2-400,window.innerHeight/2-200,width,20)
+        rect(window.innerWidth/2-400,window.innerHeight/2-height/2,width,20)
         fill('#878FAA');
-        rect(window.innerWidth/2-400,window.innerHeight/2+200,width,200)  
+        rect(window.innerWidth/2-400,window.innerHeight/2+height/2,width,200)  
     }
     
 }
@@ -649,58 +654,85 @@ function savexml(){
 
 // <JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/>
 function loadxml(){
-    opensettings('draw');
-    $("#show-draw-settings").prop("checked", true);
-
-    for (i = 0; i <= index;i++){ // CLEAR THE CURRENT ARRAY
-        joints[i] = new Joints();
-    }
-    index = 0;
-
     let XML = document.getElementById('load-xml').value;
     let JD;
-
-    XML = XML.substring(
-        XML.lastIndexOf("<L>") + 3, 
-        XML.lastIndexOf("</L>")
-    ); // FILTER THE JOINTS SECTION
-
-    XML = XML.split("<");XML.splice(0,1); // SPLIT ALL JD, also delete the first wrong value ""
-    // ["JD P1=", "245,184", "P2=", "479,82", "c=", "ffffff,2,1,0", "/>"]
-    //     0         1         2       3        4          5 
-    for (i = 0; i < XML.length;i++){
-        JD = XML[i].split('"');
-        let pt1 = {x:0,y:0,JD:""};
-        
-        if (!(JD[0] == "JPL P1=")){ // SHOULD IMPLEMENT JPL 
-            pt1.JD = JD[1].split(",");
-            pt1.x = Number(pt1.JD[0]);pt1.y = Number(pt1.JD[1]);
-
-            let pt2 = {x:0,y:0,JD:""};
-            pt2.JD = JD[3].split(",");
-            pt2.x = Number(pt2.JD[0]);pt2.y = Number(pt2.JD[1]);
-
-            let ptparam = {color:"",e:0,a:1,foreground:0,JD:""};
-            ptparam.JD = JD[5].split(",");
-            let ptcolor = {r:0,g:0,b:0,JD:""};
-            ptcolor.JD = ptparam.JD[0];
-            ptcolor.r = hexToRgb(ptcolor.JD).r;
-            ptcolor.g = hexToRgb(ptcolor.JD).g;
-            ptcolor.b = hexToRgb(ptcolor.JD).b;
-
-            ptparam.e = Number(ptparam.JD[1]);
-
-            // ADD ALPHA AND FOREGROUND LATER
-            joints[i].set_p1(pt1.x+cardinal.x,pt1.y+cardinal.y);joints[i].set_p2(pt2.x+cardinal.x,pt2.y+cardinal.y);
-            joints[i].set_color(ptcolor.r,ptcolor.g,ptcolor.b);
-            joints[i].set_e(ptparam.e);
+    if (XML.startsWith('<C><P')){
+        for (i = 0; i <= index;i++){ // CLEAR THE CURRENT ARRAY
+            joints[i] = new Joints();
         }
+        index = 0;
+
         
 
-    }
+        XML = XML.substring(
+            XML.lastIndexOf("<L>") + 3, 
+            XML.lastIndexOf("</L>")
+        ); // FILTER THE JOINTS SECTION
 
-    index = XML.length;
-    isEdit.selectindex = XML.length-1;
+        XML = XML.split("<");XML.splice(0,1); // SPLIT ALL JD, also delete the first wrong value ""
+        // ["JD P1=", "245,184", "P2=", "479,82", "c=", "ffffff,2,1,0", "/>"]
+        //     0         1         2       3        4          5 
+        for (i = 0; i < XML.length;i++){
+            JD = XML[i].split('"');
+            let pt1 = {x:0,y:0,JD:""};
+            
+            if (!(JD[0] == "JPL P1=")){ // SHOULD IMPLEMENT JPL 
+                pt1.JD = JD[1].split(",");
+                pt1.x = Number(pt1.JD[0]);pt1.y = Number(pt1.JD[1]);
+
+                let pt2 = {x:0,y:0,JD:""};
+                pt2.JD = JD[3].split(",");
+                pt2.x = Number(pt2.JD[0]);pt2.y = Number(pt2.JD[1]);
+
+                let ptparam = {color:"",e:0,a:1,foreground:false,JD:""};
+                ptparam.JD = JD[5].split(",");
+                let ptcolor = {r:0,g:0,b:0,JD:""};
+                ptcolor.JD = ptparam.JD[0];
+                ptcolor.r = hexToRgb(ptcolor.JD).r;
+                ptcolor.g = hexToRgb(ptcolor.JD).g;
+                ptcolor.b = hexToRgb(ptcolor.JD).b;
+
+                ptparam.e = Number(ptparam.JD[1]);
+                
+                if (ptparam.JD.length <= 3){
+                    if ((Number(ptparam.JD[2]) < 1)){
+                        console.log(ptparam.a);
+                        ptparam.a = Number(ptparam.JD[2]);
+                    }
+                    else {
+                        ptparam.a = 1;
+                    }
+                    
+                }
+                if (ptparam.JD.length <= 4){
+                    ptparam.foreground = true;
+                }
+                else {
+                    ptparam.foreground = false;
+                }
+
+                joints[i].set_p1(pt1.x+cardinal.x,pt1.y+cardinal.y);joints[i].set_p2(pt2.x+cardinal.x,pt2.y+cardinal.y);
+                joints[i].set_color(ptcolor.r,ptcolor.g,ptcolor.b);
+                joints[i].set_e(ptparam.e);
+                joints[i].set_alpha(ptparam.a);
+                joints[i].set_foreground(ptparam.foreground);
+
+            } // END IF
+            
+        } // END FOR
+
+            index = XML.length;
+            isEdit.selectindex = XML.length;
+
+
+            // DISPLAY EXCEPT POINTS
+            DisplayJoints(false);
+
+    } // END IF STARTSWITH
+
+    else {
+        alert("You can't load a wrong XML");
+    }
 
 
 }
