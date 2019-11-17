@@ -15,7 +15,7 @@ function setup(){
     createCanvas(window.innerWidth, window.innerHeight); // BG
     background(106,116,149); // BG COLOR
     bgcolor = color(106,116,149);
-    for (let i = 0; i < 2000; i++) { // CREATE 1000 POSSIBLE LINE, MIGHT CHANGE THIS
+    for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
         joints.push(new Joints());
               }
     background(106,116,149); // 
@@ -119,7 +119,7 @@ function mouseReleased() {
         dragged = false;
   }
 
-// FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
+// DRAW EDITOR FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 function DisplayJoints(){
     background(106,116,149); // RESET BG EVERYTIME
     displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
@@ -413,7 +413,6 @@ function Editing(){
 
                     updateSelecteInput(joints[isEdit.selectindex].e);
                     updateSelecteSlider(joints[isEdit.selectindex].e);
-                    console.log(document.getElementById('selectbf').checked);
 
                     if (document.getElementById('selectbf').checked === true && joints[isEdit.selectindex].foreground === false){ // SYNC FB 
                         $("#selectbf").prop("checked", false);
@@ -530,8 +529,26 @@ function displaytfmbg(width, height, visible = true){
     }
     
 }
+// NAV DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function opensettings(setchoose){ // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
+   if (setchoose === "draw" ){
+    $("#show-xml-settings").prop("checked", false);
+   }
+   else if (setchoose === "xml" ){
+    $("#show-draw-settings").prop("checked", false);
+   }
+
+}
+
+
+
 
 // DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
   // DEFAULT
@@ -609,7 +626,84 @@ function updatesbf(){
 }
 
 
+// XML FUNCTIONS -----------------------------------------------------------------------------------------------------------------------------------
+// <C><P /><Z><S /><D /><O /><L><JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/></L></Z></C>
+function savexml(){
+    let XML = "";
+    XML += '<C><P /><Z><S /><D /><O /><L>';
 
+    for (i = 0; i < index;i++){
+            XML += `<JD P1="${joints[i].x1-cardinal.x},${joints[i].y1-cardinal.y}"P2="${joints[i].x2-cardinal.x},${joints[i].y2-cardinal.y}"c="`;
+            XML += `${rgbToHex(joints[i].c.r,joints[i].c.g,joints[i].c.b).substring(1)},${joints[i].e}`;
+        if (!(Number(joints[i].c.a) === 1)){
+            XML += `,${Number(joints[i].c.a).toFixed(2)}`;
+        }
+        if (joints[i].foreground === true){
+            XML+= ",1";
+        }
+            XML+='"/>'
+    }
+    XML+="</L></Z></C>";
+    document.getElementById('save-xml').value = XML;
+}
+
+// <JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/>
+function loadxml(){
+    opensettings('draw');
+    $("#show-draw-settings").prop("checked", true);
+
+    for (i = 0; i <= index;i++){ // CLEAR THE CURRENT ARRAY
+        joints[i] = new Joints();
+    }
+    index = 0;
+
+    let XML = document.getElementById('load-xml').value;
+    let JD;
+
+    XML = XML.substring(
+        XML.lastIndexOf("<L>") + 3, 
+        XML.lastIndexOf("</L>")
+    ); // FILTER THE JOINTS SECTION
+
+    XML = XML.split("<");XML.splice(0,1); // SPLIT ALL JD, also delete the first wrong value ""
+    // ["JD P1=", "245,184", "P2=", "479,82", "c=", "ffffff,2,1,0", "/>"]
+    //     0         1         2       3        4          5 
+    for (i = 0; i < XML.length;i++){
+        JD = XML[i].split('"');
+        let pt1 = {x:0,y:0,JD:""};
+        
+        if (!(JD[0] == "JPL P1=")){ // SHOULD IMPLEMENT JPL 
+            pt1.JD = JD[1].split(",");
+            pt1.x = Number(pt1.JD[0]);pt1.y = Number(pt1.JD[1]);
+
+            let pt2 = {x:0,y:0,JD:""};
+            pt2.JD = JD[3].split(",");
+            pt2.x = Number(pt2.JD[0]);pt2.y = Number(pt2.JD[1]);
+
+            let ptparam = {color:"",e:0,a:1,foreground:0,JD:""};
+            ptparam.JD = JD[5].split(",");
+            let ptcolor = {r:0,g:0,b:0,JD:""};
+            ptcolor.JD = ptparam.JD[0];
+            ptcolor.r = hexToRgb(ptcolor.JD).r;
+            ptcolor.g = hexToRgb(ptcolor.JD).g;
+            ptcolor.b = hexToRgb(ptcolor.JD).b;
+
+            ptparam.e = Number(ptparam.JD[1]);
+
+            // ADD ALPHA AND FOREGROUND LATER
+            joints[i].set_p1(pt1.x+cardinal.x,pt1.y+cardinal.y);joints[i].set_p2(pt2.x+cardinal.x,pt2.y+cardinal.y);
+            joints[i].set_color(ptcolor.r,ptcolor.g,ptcolor.b);
+            joints[i].set_e(ptparam.e);
+        }
+        
+
+    }
+
+    index = XML.length;
+    isEdit.selectindex = XML.length-1;
+
+
+}
 
 
 

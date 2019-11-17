@@ -17,9 +17,13 @@
 <body>
 
     <div id="menuToggle">
-        <input type="checkbox" id="show-draw-settings" />
         <!-- CHECKBOX -->
+        <input type="checkbox" id="show-draw-settings" onclick="opensettings('draw');"/>
         <img src="icons/pencil.png" alt="brushicon" id="brushlogo">
+        <!-- CHECKBOX -->
+        <input type="checkbox" id="show-xml-settings" onclick="opensettings('xml');"/>   
+        <img src="icons/xml.png" alt="brushicon" id="xmllogo">
+
 
         <nav class="draw-settings">
             <!-- ALL SETTINGS ON THIS DIV -->
@@ -113,6 +117,29 @@
                 </li>
             </ul>
 
+        </nav>
+
+        <nav class="xml-settings">
+            <ul>
+                <li class="item-color">
+                    <span class="linebolder"></span>
+                </li>
+                <li class="item-color">
+                    <input class="save-xml" type="button" onclick="savexml();" value="SAVE XML">
+                </li>
+                <li class="item-color">
+                    <textarea id="save-xml" name="save-xml" onclick="this.focus();this.select();" rows="10" cols="30"></textarea>
+                </li>
+                <li class="item-color">
+                        <span class="linebolder"></span>
+                </li>
+                <li class="item-color">
+                    <input class="load-xml" type="button" onclick="loadxml();" value="LOAD XML">
+                </li>
+                <li class="item-color">
+                    <textarea id="load-xml" name="load-xml" rows="10" cols="30"></textarea>
+                </li>
+            </ul>
         </nav>
 
         <div class="navbar"></div>
