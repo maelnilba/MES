@@ -2,7 +2,8 @@
 
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
-var joints = []
+var joints = [];
+var layouts = [];
 var SpaceNotAllowed = 50;
 let tfmbg_width = 800;
 let tfmbg_height = 400;
@@ -15,9 +16,21 @@ function setup(){
     createCanvas(window.innerWidth, window.innerHeight); // BG
     background(106,116,149); // BG COLOR
     bgcolor = color(106,116,149);
-    for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
+    current_layout = 0;
+    // CREATE LAYOUT 
+    // layouts[current_layout].layout[value] = joint
+    layouts.push(new Layouts());
+    layouts[current_layout].create_layout();
+    
+    /* for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
         joints.push(new Joints());
-              }
+              } */
+    // avant : joints[] -- layouts[current_layout].layout[]
+    
+    
+    // layouts[current_layout].set_layout(joints);
+    // layouts[0].layout[0]); -- FIRST JOINTS OF THE FIRST LAYOUT
+
     background(106,116,149); // 
     displaytfmbg(tfmbg_width,tfmbg_height); // MAP BG
 
@@ -129,15 +142,15 @@ function DisplayJoints(showpts = true){
 
 
     for (let i = 0; i < index; i++){
-        if (joints[i].foreground === false){
-                joints[i].display();
+        if (layouts[current_layout].layout[i].foreground === false){
+            layouts[current_layout].layout[i].display();
         }
 
     } 
 
     for (let i = 0; i < index; i++){
-        if (joints[i].foreground === true){
-                joints[i].display();
+        if (layouts[current_layout].layout[i].foreground === true){
+                layouts[current_layout].layout[i].display();
         }
 
     } 
@@ -146,12 +159,12 @@ function DisplayJoints(showpts = true){
         for (let i = 0; i < index; i++){
 
             if (i === isEdit.selectindex){
-                joints[i].set_pointsalpha(1);
+                layouts[current_layout].layout[i].set_pointsalpha(1);
                 }
-            if ((joints[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
-                joints[i].set_pointsalpha(0.75);
+            if ((layouts[current_layout].layout[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)){
+                layouts[current_layout].layout[i].set_pointsalpha(0.75);
                 }
-                joints[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
+                layouts[current_layout].layout[i].displaypoints(showpoints.p1,showpoints.p2,showpoints.pc);
         }  
     }
     
@@ -201,7 +214,7 @@ function SyncSettingsDOM(){
         SelectColor = rgbvals;
 
         if (!(rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b).toUpperCase() === document.getElementById('selectcolorval').value)){
-            joints[isEdit.selectindex].set_color(SelectColor.r,SelectColor.g,SelectColor.b);
+            layouts[current_layout].layout[isEdit.selectindex].set_color(SelectColor.r,SelectColor.g,SelectColor.b);
         }
 
         document.getElementById('directScolor').style.backgroundColor = rgbToHex(SelectColor.r,SelectColor.g,SelectColor.b);
@@ -219,7 +232,7 @@ function SyncSettingsDOM(){
         SelectAlpha = $('#selectcolor').minicolors('opacity');
 
         if (!(SelectAlpha === document.getElementById('selectalphaval').value)){
-            joints[isEdit.selectindex].set_alpha(SelectAlpha);          
+            layouts[current_layout].layout[isEdit.selectindex].set_alpha(SelectAlpha);          
         }
 
         document.getElementById('directScolor').style.opacity = $('#selectcolor').minicolors('opacity');
@@ -232,19 +245,19 @@ function SyncSettingsDOM(){
     // P1 AND P2 SETTINGS
 
     if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) { 
-        document.getElementById('p1x').value = joints[isEdit.selectindex].get_p1().x-cardinal.x;
+        document.getElementById('p1x').value = layouts[current_layout].layout[isEdit.selectindex].get_p1().x-cardinal.x;
     }
     
     if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) { 
-        document.getElementById('p1y').value = joints[isEdit.selectindex].get_p1().y-cardinal.y;
+        document.getElementById('p1y').value = layouts[current_layout].layout[isEdit.selectindex].get_p1().y-cardinal.y;
     }
 
     if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) { 
-        document.getElementById('p2x').value = joints[isEdit.selectindex].get_p2().x-cardinal.x;
+        document.getElementById('p2x').value = layouts[current_layout].layout[isEdit.selectindex].get_p2().x-cardinal.x;
     }
 
     if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) { 
-        document.getElementById('p2y').value = joints[isEdit.selectindex].get_p2().y-cardinal.y;
+        document.getElementById('p2y').value = layouts[current_layout].layout[isEdit.selectindex].get_p2().y-cardinal.y;
     }
 
     document.getElementById('selectindex').value = Number(isEdit.selectindex);  // SYNC INDEX
@@ -257,18 +270,18 @@ function Drawing(){
             
             if (locked === true && dragged === false && isDrawing === false){
                     isEdit.selectindex = index;
-                    joints[index].set_color(DefaultColor.r,DefaultColor.g,DefaultColor.b); // DEFAULT SETTER
-                    joints[index].set_alpha(DefaultAlpha);
-                    joints[index].set_e(DefaultE);
-                    joints[index].set_foreground(Defaultfb);
+                    layouts[current_layout].layout[index].set_color(DefaultColor.r,DefaultColor.g,DefaultColor.b); // DEFAULT SETTER
+                    layouts[current_layout].layout[index].set_alpha(DefaultAlpha);
+                    layouts[current_layout].layout[index].set_e(DefaultE);
+                    layouts[current_layout].layout[index].set_foreground(Defaultfb);
 
-                    joints[index].set_p1(mspos.x,mspos.y);
-                    joints[index].set_p2(mspos.x,mspos.y);
+                    layouts[current_layout].layout[index].set_p1(mspos.x,mspos.y);
+                    layouts[current_layout].layout[index].set_p2(mspos.x,mspos.y);
                     isDrawing = true;
             }
             if (locked === true && dragged === true && isDrawing === true){
-                    joints[index].set_p2(mspos.x,mspos.y);
-                    joints[index].display();joints[index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
+                layouts[current_layout].layout[index].set_p2(mspos.x,mspos.y);
+                layouts[current_layout].layout[index].display();layouts[current_layout].layout[index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
             }    
         }
 
@@ -317,13 +330,13 @@ function Drawing(){
                     $('#selectcolor').minicolors('value',rgbToHex(DefaultColor.r,DefaultColor.g,DefaultColor.b));
                     $('#selectcolor').minicolors('opacity',DefaultAlpha);  
 
-                    if (document.getElementById('selectbf').checked === true && joints[isEdit.selectindex].foreground === false){ // SYNC FB
+                    if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[isEdit.selectindex].foreground === false){ // SYNC FB
                         $("#selectbf").prop("checked", false);
-                        joints[isEdit.selectindex].foreground = false;
+                        layouts[current_layout].layout[isEdit.selectindex].foreground = false;
                     } 
-                    else if (document.getElementById('selectbf').checked === false && joints[isEdit.selectindex].foreground === true){
+                    else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[isEdit.selectindex].foreground === true){
                         $("#selectbf").prop("checked", true);
-                        joints[isEdit.selectindex].foreground = true;
+                        layouts[current_layout].layout[isEdit.selectindex].foreground = true;
                     }                    
         } 
     }
@@ -334,21 +347,21 @@ function Cursoring() {
     // DETECT IF CURSOR ON A POINT
     if (isDrawing === false){
         for (let i = 0; i < index; i++){
-            if (((mouseX > (joints[i].get_p1().x)-10) && (mouseX < (joints[i].get_p1().x)+10)) &&  (mouseY > (joints[i].get_p1().y)-10) && (mouseY < (joints[i].get_p1().y)+10)){
+            if (((mouseX > (layouts[current_layout].layout[i].get_p1().x)-10) && (mouseX < (layouts[current_layout].layout[i].get_p1().x)+10)) &&  (mouseY > (layouts[current_layout].layout[i].get_p1().y)-10) && (mouseY < (layouts[current_layout].layout[i].get_p1().y)+10)){
                 Select.state = true;Select.p = 1;// P1 
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 1;
                 }
                 break;
             }
-            else if (((mouseX > (joints[i].get_p2().x)-10) && (mouseX < (joints[i].get_p2().x)+10)) &&  ((mouseY > (joints[i].get_p2().y)-10) && (mouseY < (joints[i].get_p2().y)+10))) {
+            else if (((mouseX > (layouts[current_layout].layout[i].get_p2().x)-10) && (mouseX < (layouts[current_layout].layout[i].get_p2().x)+10)) &&  ((mouseY > (layouts[current_layout].layout[i].get_p2().y)-10) && (mouseY < (layouts[current_layout].layout[i].get_p2().y)+10))) {
                 Select.state = true;Select.p = 2 // P2
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 2;
                 }
                 break;
             }
-            else if (((mouseX > (joints[i].get_pc().x)-10) && (mouseX < (joints[i].get_pc().x)+10)) &&  ((mouseY > (joints[i].get_pc().y)-10) && (mouseY < (joints[i].get_pc().y)+10))) {
+            else if (((mouseX > (layouts[current_layout].layout[i].get_pc().x)-10) && (mouseX < (layouts[current_layout].layout[i].get_pc().x)+10)) &&  ((mouseY > (layouts[current_layout].layout[i].get_pc().y)-10) && (mouseY < (layouts[current_layout].layout[i].get_pc().y)+10))) {
                 Select.state = true;Select.p = 12 // PCENTER
                 if ((locked === true) && (Select.state === true) && isEdit.state === false){
                     isEdit.state = true;isEdit.selectindex = i;isEdit.pnumber = 12;
@@ -378,54 +391,54 @@ function Editing(){
 
 
         if (savealpha.state === false){ // SAUVEGARDE ALPHA INITIAL
-            savealpha.alpha = joints[isEdit.selectindex].c.a;
+            savealpha.alpha = layouts[current_layout].layout[isEdit.selectindex].c.a;
             savealpha.state = true;
         }
         
 
         if (isEdit.pnumber === 1){ // MOVE P1
-            joints[isEdit.selectindex].set_alpha(0.5);
-            joints[isEdit.selectindex].set_p1(mspos.x,mspos.y);
+            layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
+            layouts[current_layout].layout[isEdit.selectindex].set_p1(mspos.x,mspos.y);
            
         }
         else if (isEdit.pnumber === 2){ // MOVE P2
-            joints[isEdit.selectindex].set_alpha(0.5);
-            joints[isEdit.selectindex].set_p2(mspos.x,mspos.y);
+            layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
+            layouts[current_layout].layout[isEdit.selectindex].set_p2(mspos.x,mspos.y);
             
         }
         else if (isEdit.pnumber === 12){ // MOVE P1 AND P2
 
             if (isEdit.taked === false){ // SAVE THE ORIGINAL POSITION
-            isEdit.p1pos = joints[isEdit.selectindex].get_p1();
-            isEdit.p2pos = joints[isEdit.selectindex].get_p2();
-            isEdit.pcenter = joints[isEdit.selectindex].get_pc();
+            isEdit.p1pos = layouts[current_layout].layout[isEdit.selectindex].get_p1();
+            isEdit.p2pos = layouts[current_layout].layout[isEdit.selectindex].get_p2();
+            isEdit.pcenter = layouts[current_layout].layout[isEdit.selectindex].get_pc();
             isEdit.taked = true;
             }   // CALC THE GAP BETWEEN THE MOUSEPOS AND THE ORIGINAL POSITION
-            joints[isEdit.selectindex].set_alpha(0.5);
-            joints[isEdit.selectindex].set_p1(Math.round(isEdit.p1pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y)));
-            joints[isEdit.selectindex].set_p2(Math.round(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y)));
+            layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
+            layouts[current_layout].layout[isEdit.selectindex].set_p1(Math.round(isEdit.p1pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p1pos.y-(isEdit.pcenter.y-mspos.y)));
+            layouts[current_layout].layout[isEdit.selectindex].set_p2(Math.round(isEdit.p2pos.x-(isEdit.pcenter.x-mspos.x)),Math.round(isEdit.p2pos.y-(isEdit.pcenter.y-mspos.y)));
             
         }
         if (locked === false){
             isEdit.state = false;isEdit.taked = false;
-            joints[isEdit.selectindex].set_alpha(savealpha.alpha);
+            layouts[current_layout].layout[isEdit.selectindex].set_alpha(savealpha.alpha);
             savealpha.state = false;
         }
 
                     // SYNC PARAM
-                    $('#selectcolor').minicolors('value',rgbToHex(joints[isEdit.selectindex].c.r,joints[isEdit.selectindex].c.g,joints[isEdit.selectindex].c.b).substring(1));
+                    $('#selectcolor').minicolors('value',rgbToHex(layouts[current_layout].layout[isEdit.selectindex].c.r,layouts[current_layout].layout[isEdit.selectindex].c.g,layouts[current_layout].layout[isEdit.selectindex].c.b).substring(1));
                     $('#selectcolor').minicolors('opacity',savealpha.alpha); 
 
-                    updateSelecteInput(joints[isEdit.selectindex].e);
-                    updateSelecteSlider(joints[isEdit.selectindex].e);
+                    updateSelecteInput(layouts[current_layout].layout[isEdit.selectindex].e);
+                    updateSelecteSlider(layouts[current_layout].layout[isEdit.selectindex].e);
 
-                    if (document.getElementById('selectbf').checked === true && joints[isEdit.selectindex].foreground === false){ // SYNC FB 
+                    if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[isEdit.selectindex].foreground === false){ // SYNC FB 
                         $("#selectbf").prop("checked", false);
-                        joints[isEdit.selectindex].foreground = false;
+                        layouts[current_layout].layout[isEdit.selectindex].foreground = false;
                     }
-                    else if (document.getElementById('selectbf').checked === false && joints[isEdit.selectindex].foreground === true){
+                    else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[isEdit.selectindex].foreground === true){
                         $("#selectbf").prop("checked", true);
-                        joints[isEdit.selectindex].foreground = true;
+                        layouts[current_layout].layout[isEdit.selectindex].foreground = true;
                     }   
     }
 }
@@ -436,7 +449,7 @@ function deletejoint() {
 
         let indexcompt = isEdit.selectindex;
             while (indexcompt < index) {
-                copyjoint(joints[indexcompt],joints[indexcompt+1]);
+                copyjoint(layouts[current_layout].layout[indexcompt],layouts[current_layout].layout[indexcompt+1]);
                 indexcompt++;
             }
         if (index > 0){
@@ -453,7 +466,7 @@ function deletejoint() {
 function duplicatejoint() {
     if (isDrawing === false){
         if (index > 0){
-          copyjoint(joints[index],joints[isEdit.selectindex],40);
+          copyjoint(layouts[current_layout].layout[index],layouts[current_layout].layout[isEdit.selectindex],40);
           isEdit.selectindex = index;
         index++;  
         }
@@ -468,9 +481,9 @@ function zplus() {
     if (isDrawing === false){
         if ((isEdit.selectindex >= 0) && (isEdit.selectindex < index - 1)){
             let save = new Joints();
-            copyjoint(save,joints[isEdit.selectindex+1]);
-            copyjoint(joints[isEdit.selectindex+1],joints[isEdit.selectindex]);
-            copyjoint(joints[isEdit.selectindex],save);
+            copyjoint(save,layouts[current_layout].layout[isEdit.selectindex+1]);
+            copyjoint(layouts[current_layout].layout[isEdit.selectindex+1],layouts[current_layout].layout[isEdit.selectindex]);
+            copyjoint(layouts[current_layout].layout[isEdit.selectindex],save);
             isEdit.selectindex++;
         }
         
@@ -481,9 +494,9 @@ function zminus(){
     if (isDrawing === false){
         if ((isEdit.selectindex > 0) && (isEdit.selectindex < index )){
             let save = new Joints();
-            copyjoint(save,joints[isEdit.selectindex-1]);
-            copyjoint(joints[isEdit.selectindex-1],joints[isEdit.selectindex]);
-            copyjoint(joints[isEdit.selectindex],save);
+            copyjoint(save,layouts[current_layout].layout[isEdit.selectindex-1]);
+            copyjoint(layouts[current_layout].layout[isEdit.selectindex-1],layouts[current_layout].layout[isEdit.selectindex]);
+            copyjoint(layouts[current_layout].layout[isEdit.selectindex],save);
             isEdit.selectindex--;
         }
     }
@@ -581,7 +594,7 @@ function opensettings(setchoose){ // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
   // SELECT
   function updateSelecteInput(val) {
     document.getElementById('selectevalin').value=val; 
-    joints[isEdit.selectindex].set_e(val);
+    layouts[current_layout].layout[isEdit.selectindex].set_e(val);
   }
 
   function updateSelecteSlider(val) {
@@ -596,24 +609,24 @@ function opensettings(setchoose){ // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
           val = 1;
       }
     document.getElementById('selecteval').value=val; 
-    joints[isEdit.selectindex].set_e(val);
+    layouts[current_layout].layout[isEdit.selectindex].set_e(val);
   }
 
   // P1 
 function updateP1x(val){
-    joints[isEdit.selectindex].x1 = Number(val)+cardinal.x;
+    layouts[current_layout].layout[isEdit.selectindex].x1 = Number(val)+cardinal.x;
 }
 
 function updateP1y(val){
-    joints[isEdit.selectindex].y1 = Number(val)+cardinal.y;
+    layouts[current_layout].layout[isEdit.selectindex].y1 = Number(val)+cardinal.y;
 }
 
 function updateP2x(val){
-    joints[isEdit.selectindex].x2 = Number(val)+cardinal.x;
+    layouts[current_layout].layout[isEdit.selectindex].x2 = Number(val)+cardinal.x;
 }
 
 function updateP2y(val){
-    joints[isEdit.selectindex].y2 = Number(val)+cardinal.y;
+    layouts[current_layout].layout[isEdit.selectindex].y2 = Number(val)+cardinal.y;
 }
 
 function updatebf(){
@@ -627,27 +640,31 @@ function updatebf(){
 
 function updatesbf(){
     let state = document.getElementById('selectbf').checked;
-    joints[isEdit.selectindex].set_foreground(state);
+    layouts[current_layout].layout[isEdit.selectindex].set_foreground(state);
 }
 
 
 // XML FUNCTIONS -----------------------------------------------------------------------------------------------------------------------------------
 // <C><P /><Z><S /><D /><O /><L><JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/></L></Z></C>
+// layouts[current_layout].layout
 function savexml(){
     let XML = "";
     XML += '<C><P /><Z><S /><D /><O /><L>';
 
-    for (i = 0; i < index;i++){
-            XML += `<JD P1="${joints[i].x1-cardinal.x},${joints[i].y1-cardinal.y}"P2="${joints[i].x2-cardinal.x},${joints[i].y2-cardinal.y}"c="`;
-            XML += `${rgbToHex(joints[i].c.r,joints[i].c.g,joints[i].c.b).substring(1)},${joints[i].e}`;
-        if (!(Number(joints[i].c.a) === 1)){
-            XML += `,${Number(joints[i].c.a).toFixed(2)}`;
+    for (c = 0; c < layouts.length;c++){
+       for (i = 0; i < index;i++){
+            XML += `<JD P1="${layouts[c].layout[i].x1-cardinal.x},${layouts[c].layout[i].y1-cardinal.y}"P2="${layouts[c].layout[i].x2-cardinal.x},${layouts[c].layout[i].y2-cardinal.y}"c="`;
+            XML += `${rgbToHex(layouts[c].layout[i].c.r,layouts[c].layout[i].c.g,layouts[c].layout[i].c.b).substring(1)},${layouts[c].layout[i].e}`;
+        if (!(Number(layouts[c].layout[i].c.a) === 1)){
+            XML += `,${Number(layouts[c].layout[i].c.a).toFixed(2)}`;
         }
-        if (joints[i].foreground === true){
+        if (layouts[c].layout[i].foreground === true){
             XML+= ",1";
         }
             XML+='"/>'
+    } 
     }
+    
     XML+="</L></Z></C>";
     document.getElementById('save-xml').value = XML;
 }
@@ -657,10 +674,12 @@ function loadxml(){
     let XML = document.getElementById('load-xml').value;
     let JD;
     if (XML.startsWith('<C><P')){
+
+        /* 
         for (i = 0; i <= index;i++){ // CLEAR THE CURRENT ARRAY
             joints[i] = new Joints();
-        }
-        index = 0;
+        } 
+        index = 0; */ // GONNA ADD A CLEAR FUNCTION
 
         
 
@@ -696,7 +715,6 @@ function loadxml(){
                 
                 if (ptparam.JD.length <= 3){
                     if ((Number(ptparam.JD[2]) < 1)){
-                        console.log(ptparam.a);
                         ptparam.a = Number(ptparam.JD[2]);
                     }
                     else {
@@ -711,11 +729,11 @@ function loadxml(){
                     ptparam.foreground = false;
                 }
 
-                joints[i].set_p1(pt1.x+cardinal.x,pt1.y+cardinal.y);joints[i].set_p2(pt2.x+cardinal.x,pt2.y+cardinal.y);
-                joints[i].set_color(ptcolor.r,ptcolor.g,ptcolor.b);
-                joints[i].set_e(ptparam.e);
-                joints[i].set_alpha(ptparam.a);
-                joints[i].set_foreground(ptparam.foreground);
+                layouts[current_layout].layout[i].set_p1(pt1.x+cardinal.x,pt1.y+cardinal.y);layouts[current_layout].layout[i].set_p2(pt2.x+cardinal.x,pt2.y+cardinal.y);
+                layouts[current_layout].layout[i].set_color(ptcolor.r,ptcolor.g,ptcolor.b);
+                layouts[current_layout].layout[i].set_e(ptparam.e);
+                layouts[current_layout].layout[i].set_alpha(ptparam.a);
+                layouts[current_layout].layout[i].set_foreground(ptparam.foreground);
 
             } // END IF
             
@@ -750,6 +768,7 @@ function loadxml(){
         this.e = e;
         this.pointsalpha = pointsalpha;
         this.foreground = foreground;
+        
     }
 
     set_p1(x,y){
@@ -832,5 +851,35 @@ function loadxml(){
 
     }
 
+
+}
+
+class Layouts{
+    constructor(){
+        this.layout = [];
+        this.type;
+        this.name;
+
+    }
+
+    create_layout(type = "jts"){
+        for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
+            this.layout.push(new Joints());
+                }
+        this.type = type 
+        this.name = type + String(current_layout);
+    }
+
+    set_layout(array){
+        this.layout = array;
+    }
+
+    set_type(type){
+        this.type = type;
+    }
+
+    set_name(name){
+        this.name = name;
+    }
 
 }
