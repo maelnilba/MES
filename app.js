@@ -33,7 +33,6 @@ function setup() {
 	background(106, 116, 149); // 
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
 
-	index = 0; // Z VALUE
 	locked = false;
 	dragged = false; // VAR MOUSEACTIONS
 	isDrawing = false; // VAR ACTIONS
@@ -213,14 +212,14 @@ function DisplayJoints(showpts = true) {
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
 
     for (let c = 0; c < layouts.length; c++){
-        for (let i = 0; i < index; i++) {
+        for (let i = 0; i < layouts[c].index; i++) {
             if (layouts[c].layout[i].foreground === false) {
                 layouts[c].layout[i].display();
             }
 
         }
 
-        for (let i = 0; i < index; i++) {
+        for (let i = 0; i < layouts[c].index; i++) {
             if (layouts[c].layout[i].foreground === true) {
                 layouts[c].layout[i].display();
             }
@@ -231,7 +230,7 @@ function DisplayJoints(showpts = true) {
 
 	if (showpts) {
         for (let c = 0; c < layouts.length; c++){
-            for (let i = 0; i < index; i++) {
+            for (let i = 0; i < layouts[c].index; i++) {
 
                 if (i === isEdit.selectindex) {
                     layouts[c].layout[i].set_pointsalpha(1);
@@ -341,26 +340,26 @@ function Drawing() {
 		if (mouseIsPressed) {
 
 			if (locked === true && dragged === false && isDrawing === false) {
-				isEdit.selectindex = index;
-				layouts[current_layout].layout[index].set_color(DefaultColor.r, DefaultColor.g, DefaultColor.b); // DEFAULT SETTER
-				layouts[current_layout].layout[index].set_alpha(DefaultAlpha);
-				layouts[current_layout].layout[index].set_e(DefaultE);
-				layouts[current_layout].layout[index].set_foreground(Defaultfb);
+				isEdit.selectindex = layouts[current_layout].index;
+				layouts[current_layout].layout[layouts[current_layout].index].set_color(DefaultColor.r, DefaultColor.g, DefaultColor.b); // DEFAULT SETTER
+				layouts[current_layout].layout[layouts[current_layout].index].set_alpha(DefaultAlpha);
+				layouts[current_layout].layout[layouts[current_layout].index].set_e(DefaultE);
+				layouts[current_layout].layout[layouts[current_layout].index].set_foreground(Defaultfb);
 
-				layouts[current_layout].layout[index].set_p1(mspos.x, mspos.y);
-				layouts[current_layout].layout[index].set_p2(mspos.x, mspos.y);
+				layouts[current_layout].layout[layouts[current_layout].index].set_p1(mspos.x, mspos.y);
+				layouts[current_layout].layout[layouts[current_layout].index].set_p2(mspos.x, mspos.y);
 				isDrawing = true;
 			}
 			if (locked === true && dragged === true && isDrawing === true) {
-				layouts[current_layout].layout[index].set_p2(mspos.x, mspos.y);
-				layouts[current_layout].layout[index].display();
-				layouts[current_layout].layout[index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
+				layouts[current_layout].layout[layouts[current_layout].index].set_p2(mspos.x, mspos.y);
+				layouts[current_layout].layout[layouts[current_layout].index].display();
+				layouts[current_layout].layout[layouts[current_layout].index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
 			}
 		}
 
 		if (locked === false && dragged === false && isDrawing === true) {
 			isDrawing = false;
-			index += 1;
+			layouts[current_layout].up_index();
 
 			// HISTORY COLORS SET
 			updateSelecteInput(DefaultE); // SYNC PARAM
@@ -423,7 +422,7 @@ function Drawing() {
 function Cursoring() {
 	// DETECT IF CURSOR ON A POINT
 	if (isDrawing === false) {
-		for (let i = 0; i < index; i++) {
+		for (let i = 0; i < layouts[current_layout].index; i++) {
 			if (((mouseX > (layouts[current_layout].layout[i].get_p1().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p1().x) + 10)) && (mouseY > (layouts[current_layout].layout[i].get_p1().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p1().y) + 10)) {
 				Select.state = true;
 				Select.p = 1; // P1 
@@ -527,15 +526,15 @@ function deletejoint() {
 	if (isDrawing === false) {
 
 		let indexcompt = isEdit.selectindex;
-		while (indexcompt < index) {
+		while (indexcompt < layouts[current_layout].index) {
 			copyjoint(layouts[current_layout].layout[indexcompt], layouts[current_layout].layout[indexcompt + 1]);
 			indexcompt++;
 		}
-		if (index > 0) {
-			index--;
+		if (layouts[current_layout].index > 0) {
+			layouts[current_layout].down_index();
 		}
-		if (index >= 1) {
-			isEdit.selectindex = index - 1;
+		if (layouts[current_layout].index >= 1) {
+			isEdit.selectindex = layouts[current_layout].index - 1;
 		}
 
 		Select.state = false;
@@ -544,10 +543,10 @@ function deletejoint() {
 
 function duplicatejoint() {
 	if (isDrawing === false) {
-		if (index > 0) {
-			copyjoint(layouts[current_layout].layout[index], layouts[current_layout].layout[isEdit.selectindex], 40);
-			isEdit.selectindex = index;
-			index++;
+		if (layouts[current_layout].index > 0) {
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].index], layouts[current_layout].layout[isEdit.selectindex], 40);
+			isEdit.selectindex = layouts[current_layout].index;
+			layouts[current_layout].up_index();
 		}
 
 		Select.state = false;
@@ -558,7 +557,7 @@ function duplicatejoint() {
 
 function zplus() {
 	if (isDrawing === false) {
-		if ((isEdit.selectindex >= 0) && (isEdit.selectindex < index - 1)) {
+		if ((isEdit.selectindex >= 0) && (isEdit.selectindex < layouts[current_layout].index - 1)) {
 			let save = new Joints();
 			copyjoint(save, layouts[current_layout].layout[isEdit.selectindex + 1]);
 			copyjoint(layouts[current_layout].layout[isEdit.selectindex + 1], layouts[current_layout].layout[isEdit.selectindex]);
@@ -571,7 +570,7 @@ function zplus() {
 
 function zminus() {
 	if (isDrawing === false) {
-		if ((isEdit.selectindex > 0) && (isEdit.selectindex < index)) {
+		if ((isEdit.selectindex > 0) && (isEdit.selectindex < layouts[current_layout].index)) {
 			let save = new Joints();
 			copyjoint(save, layouts[current_layout].layout[isEdit.selectindex - 1]);
 			copyjoint(layouts[current_layout].layout[isEdit.selectindex - 1], layouts[current_layout].layout[isEdit.selectindex]);
@@ -721,7 +720,7 @@ function savexml() {
 	XML += '<C><P /><Z><S /><D /><O /><L>';
 
 	for (c = 0; c < layouts.length; c++) {
-		for (i = 0; i < index; i++) {
+		for (i = 0; i < layouts[c].index; i++) {
 			XML += `<JD P1="${layouts[c].layout[i].x1-cardinal.x},${layouts[c].layout[i].y1-cardinal.y}"P2="${layouts[c].layout[i].x2-cardinal.x},${layouts[c].layout[i].y2-cardinal.y}"c="`;
 			XML += `${rgbToHex(layouts[c].layout[i].c.r,layouts[c].layout[i].c.g,layouts[c].layout[i].c.b).substring(1)},${layouts[c].layout[i].e}`;
 			if (!(Number(layouts[c].layout[i].c.a) === 1)) {
@@ -812,19 +811,19 @@ function loadxml() {
 					ptparam.foreground = false;
 				}
 
-				layouts[current_layout].layout[i+index].set_p1(pt1.x + cardinal.x, pt1.y + cardinal.y);
-				layouts[current_layout].layout[i+index].set_p2(pt2.x + cardinal.x, pt2.y + cardinal.y);
-				layouts[current_layout].layout[i+index].set_color(ptcolor.r, ptcolor.g, ptcolor.b);
-				layouts[current_layout].layout[i+index].set_e(ptparam.e);
-				layouts[current_layout].layout[i+index].set_alpha(ptparam.a);
-				layouts[current_layout].layout[i+index].set_foreground(ptparam.foreground);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_p1(pt1.x + cardinal.x, pt1.y + cardinal.y);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_p2(pt2.x + cardinal.x, pt2.y + cardinal.y);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_color(ptcolor.r, ptcolor.g, ptcolor.b);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_e(ptparam.e);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_alpha(ptparam.a);
+				layouts[current_layout].layout[i+layouts[current_layout].index].set_foreground(ptparam.foreground);
 
 			} // END IF
 
 		} // END FOR
 
-        isEdit.selectindex = XML.length+index-1;
-		index = XML.length+index;
+        isEdit.selectindex = XML.length+layouts[current_layout].index-1;
+		layouts[current_layout].index = XML.length+layouts[current_layout].index;
 		
 
 
@@ -841,7 +840,8 @@ function loadxml() {
 
 function clearAll(){
     if (confirm("Are you sure to delete all ?")){
-        index = 0;
+        layouts[current_layout].set_index(0);
+        isEdit.selectindex = 0;
 
         for (let c = 0; c < layouts.length; c++){
             for (let i = 0; i < layouts[c].length; i++){
@@ -977,7 +977,7 @@ class Layouts { // layouts[current_layout].layout[value]
 		this.layout = [];
 		this.type;
 		this.name;
-
+        this.index = 0;
 	}
 
 	create_layout(type = "jts") { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
@@ -998,6 +998,18 @@ class Layouts { // layouts[current_layout].layout[value]
 
 	set_name(name) {
 		this.name = name;
-	}
+    }
+    
+    set_index(value){
+        this.index = value;
+    }
+
+    up_index(){
+        this.index = this.index + 1;
+    }
+
+    down_index(){
+        this.index = this.index - 1;
+    }
 
 }
