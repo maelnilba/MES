@@ -5,7 +5,7 @@
 // FIND NICE ICONS.......................
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
-var SpaceNotAllowed = 50;
+var SpaceNotAllowed = {left:50,right:0};
 let tfmbg_width = 800;
 let tfmbg_height = 400;
 let cardinal = {
@@ -159,6 +159,7 @@ function draw() {
 
 
 	// console.log(); // FOR NOOB TESTING
+	console.log((zoom.step));
  
         
     
@@ -175,7 +176,8 @@ function keyTyped() {
 			duplicatejoint();
         }
         if (key === ' '){
-            dragspace.key = true;
+			dragspace.key = true;
+			cursor(CROSS);
         }
         if ((key === 'r') || (key === 'R')){
             resetpos();
@@ -186,6 +188,34 @@ function keyTyped() {
 
 		if ((key === '+')){
 			apply_zoom(125);
+		}
+
+		if ((key === '0')){
+			resetzoom();
+		}
+
+		if ((key === '1')){
+			if (showpoints.p1 === true){
+				showpoints.p1 = false;
+			} else {
+				showpoints.p1 = true;
+			}
+		}
+
+		if ((key === '2')){
+			if (showpoints.p2 === true){
+				showpoints.p2 = false;
+			} else {
+				showpoints.p2 = true;
+			}
+		}
+
+		if ((key === '3')){
+			if (showpoints.pc === true){
+				showpoints.pc = false;
+			} else {
+				showpoints.pc = true;
+			}
 		}
 	}
 }
@@ -204,7 +234,8 @@ function keyReleased(){
             for (let i = 0; i < layouts[c].index; i++){
                 layouts[c].layout[i].endmoving();
             }
-        }  
+		}  
+		cursor(ARROW);
     }
 
 }
@@ -213,44 +244,7 @@ function mouseWheel(event) { // ZOOM      - NEED FIX SOMES ISSUES
 	apply_zoom(event.delta);
 }
 
-function apply_zoom(value){
 
-	if ((value < 0) && (zoom.step > -2)){ // -
-		zoom_less();
-		zoom.step--; 
-		zoomvalue /= 2;
-	} else if (value > 0 && zoom.step < 2) { // +
-		zoom_more();
-		zoom.step++;
-		zoomvalue *=2;
-	}
-
-	if (zoom.step > 2){
-	zoom.step = 2;
-	} else if (zoom.step < -2){
-	zoom.step = -2;
-	}
-}
-
-function zoom_more(){
-	cardinal.x += (cardinal.x - zoom.centerx);
-    cardinal.y += (cardinal.y - zoom.centery);
-    for (let c = 0; c < layouts.length; c++){
-        for (let i = 0; i < layouts[c].index; i++){
-            layouts[c].layout[i].zoom(1);
-        }
-	} 
-}
-
-function zoom_less(){
-	cardinal.x -= Math.round((cardinal.x - zoom.centerx)/2);
-	cardinal.y -= Math.round((cardinal.y - zoom.centery)/2);
-	for (let c = 0; c < layouts.length; c++){
-		for (let i = 0; i < layouts[c].index; i++){
-			layouts[c].layout[i].zoom(-1);
-		}
-	} 
-}
 
 
 
@@ -259,12 +253,14 @@ function zoom_less(){
 function mousePressed() {
 
 	if (document.getElementById("show-draw-settings").checked) {
-		SpaceNotAllowed = 250;
+		SpaceNotAllowed.left = 250;
+		SpaceNotAllowed.right = 200;
 	} else {
-		SpaceNotAllowed = 50;
+		SpaceNotAllowed.left = 50;
+		SpaceNotAllowed.right = 0;
 	}
   
-	if (mouseX > SpaceNotAllowed) { // CANNOT DRAW IF MOUSE ON PARAMETERS
+	if ((mouseX > SpaceNotAllowed.left) && (mouseX < (windowWidth - SpaceNotAllowed.right))) { // CANNOT DRAW IF MOUSE ON PARAMETERS
 		locked = true;
 	} else {
 		locked = false;
@@ -333,8 +329,59 @@ function DragZoom(){
                  
     }
 
-    // TODO ZOOM 
 }
+
+function apply_zoom(value){
+
+	if ((value < 0) && (zoom.step > -2)){ // -
+		zoom_less();
+		zoom.step--; 
+		zoomvalue /= 2;
+	} else if (value > 0 && zoom.step < 2) { // +
+		zoom_more();
+		zoom.step++;
+		zoomvalue *=2;
+	}
+
+	if (zoom.step > 2){
+	zoom.step = 2;
+	} else if (zoom.step < -2){
+	zoom.step = -2;
+	}
+}
+
+function zoom_more(){
+	cardinal.x += (cardinal.x - zoom.centerx);
+    cardinal.y += (cardinal.y - zoom.centery);
+    for (let c = 0; c < layouts.length; c++){
+        for (let i = 0; i < layouts[c].index; i++){
+            layouts[c].layout[i].zoom(1);
+        }
+	} 
+}
+
+function zoom_less(){
+	cardinal.x -= Math.round((cardinal.x - zoom.centerx)/2);
+	cardinal.y -= Math.round((cardinal.y - zoom.centery)/2);
+	for (let c = 0; c < layouts.length; c++){
+		for (let i = 0; i < layouts[c].index; i++){
+			layouts[c].layout[i].zoom(-1);
+		}
+	} 
+}
+
+function resetzoom(){	
+	if (zoom.step < 0){
+		while (zoom.step < 0){
+			apply_zoom(1);
+		}
+	} else if (zoom.step > 0){
+		while (zoom.step > 0){
+			apply_zoom(-1);
+		}
+	}
+}
+
 function DisplayJoints(showpts = true) {
 	background(106, 116, 149); // RESET BG EVERYTIME
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
@@ -443,19 +490,19 @@ function SyncSettingsDOM() {
 	// P1 AND P2 SETTINGS
 
 	if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) {
-		document.getElementById('p1x').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().x - cardinal.x;
+		document.getElementById('p1x').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().x - cardinal.x)/zoomvalue);
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) {
-		document.getElementById('p1y').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().y - cardinal.y;
+		document.getElementById('p1y').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().y - cardinal.y)/zoomvalue);
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) {
-		document.getElementById('p2x').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().x - cardinal.x;
+		document.getElementById('p2x').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().x - cardinal.x)/zoomvalue);
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) {
-		document.getElementById('p2y').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().y - cardinal.y;
+		document.getElementById('p2y').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().y - cardinal.y)/zoomvalue);
 	}
 
 	document.getElementById('selectindex').value = Number(layouts[current_layout].selectindex); // SYNC INDEX
@@ -549,7 +596,7 @@ function Drawing() {
 
 function Cursoring() {
 	// DETECT IF CURSOR ON A POINT
-	if (isDrawing === false) {
+	if (isDrawing === false && dragspace.key === false) {
 		for (let i = 0; i < layouts[current_layout].index; i++) {
 			if (((mouseX > (layouts[current_layout].layout[i].get_p1().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p1().x) + 10)) && (mouseY > (layouts[current_layout].layout[i].get_p1().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p1().y) + 10)) {
 				Select.state = true;
@@ -827,19 +874,19 @@ function updateSelecteSlider(val) {
 
 // P1 
 function updateP1x(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].x1 = Number(val) + cardinal.x;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x1 = (Number(val) + cardinal.x)*zoomvalue;
 }
 
 function updateP1y(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].y1 = Number(val) + cardinal.y;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y1 = (Number(val) + cardinal.y)*zoomvalue;
 }
 
 function updateP2x(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].x2 = Number(val) + cardinal.x;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x2 = (Number(val) + cardinal.x)*zoomvalue;
 }
 
 function updateP2y(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].y2 = Number(val) + cardinal.y;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y2 = (Number(val) + cardinal.y)*zoomvalue;
 }
 
 function updatebf() {
@@ -882,6 +929,9 @@ function savexml() {
 
 // <JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/>
 function loadxml() {
+	resetpos();
+	resetzoom();
+
 	let XML = document.getElementById('load-xml').value;
 	let JD;
 	if (XML.startsWith('<C><P')) {
