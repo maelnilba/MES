@@ -1,7 +1,8 @@
 // TODO -------------------
 // LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y  AND VISUAL SETTINGS
-// ZOOM - NEED FIX SOMES ISSUES
-
+// SOMES ISSUES WITH RESET POS MAKE A GAP -- DOESNT MATTER TOO MUCH
+// MAKE THICKNESS APPLY WITH ZOOM
+// FIND NICE ICONS.......................
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
 var SpaceNotAllowed = 50;
@@ -30,18 +31,12 @@ function setup() {
 	layouts.push(new Layouts());
 	layouts[current_layout].create_layout();
 
-
-
-	background(106, 116, 149); // 
-	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
-
 	locked = false;
 	dragged = false; // VAR MOUSEACTIONS
 	isDrawing = false; // VAR ACTIONS
 	isEdit = {
 		state: false,
 		pnumber: 0,
-		selectindex: 0,
 		taked: false,
 		p1pos: 0,
 		p2pos: 0,
@@ -130,12 +125,18 @@ function setup() {
         carx:0,
         cary:0
     };
-
+	zoomvalue = 1;
+	const originalc = {
+		centerx: cardinal.x+((tfmbg_width/2)*zoomvalue),
+		centery: cardinal.y+((tfmbg_height/2)*zoomvalue),
+	};
     zoom = {
         step:0,
-        centerx: Math.round(windowWidth/2),
-        centery: Math.round(windowHeight/2)
-    };
+        centerx: cardinal.x+((tfmbg_width/2)*zoomvalue),
+		centery: cardinal.y+((tfmbg_height/2)*zoomvalue),
+	};
+	
+	background(106, 116, 149); // 
 }
 
 
@@ -178,7 +179,14 @@ function keyTyped() {
         }
         if ((key === 'r') || (key === 'R')){
             resetpos();
-        }
+		}
+		if ((key === '-')){
+			apply_zoom(-125);
+		}
+
+		if ((key === '+')){
+			apply_zoom(125);
+		}
 	}
 }
 
@@ -202,26 +210,46 @@ function keyReleased(){
 }
 
 function mouseWheel(event) { // ZOOM      - NEED FIX SOMES ISSUES
-    if (event.delta > 0 && zoom.step > -3){ // -
-            zoom.step--;
-            cardinal.x -= Math.round((cardinal.x - zoom.centerx)/2)+200;
-            cardinal.y -= Math.round((cardinal.y - zoom.centery)/2)+100;
-        for (let c = 0; c < layouts.length; c++){
-            for (let i = 0; i < layouts[c].index; i++){
-                layouts[c].layout[i].zoom(-1);
-            }
-        } 
-    } else if (event.delta < 0 && zoom.step < 3) { // +
-            zoom.step++;
-            cardinal.x += (cardinal.x - zoom.centerx)+400;
-            cardinal.y += (cardinal.y - zoom.centery)+200;
-        for (let c = 0; c < layouts.length; c++){
-            for (let i = 0; i < layouts[c].index; i++){
-                layouts[c].layout[i].zoom(1);
-            }
-        } 
-    }
+	apply_zoom(event.delta);
+}
 
+function apply_zoom(value){
+
+	if ((value < 0) && (zoom.step > -2)){ // -
+		zoom_less();
+		zoom.step--; 
+		zoomvalue /= 2;
+	} else if (value > 0 && zoom.step < 2) { // +
+		zoom_more();
+		zoom.step++;
+		zoomvalue *=2;
+	}
+
+	if (zoom.step > 2){
+	zoom.step = 2;
+	} else if (zoom.step < -2){
+	zoom.step = -2;
+	}
+}
+
+function zoom_more(){
+	cardinal.x += (cardinal.x - zoom.centerx);
+    cardinal.y += (cardinal.y - zoom.centery);
+    for (let c = 0; c < layouts.length; c++){
+        for (let i = 0; i < layouts[c].index; i++){
+            layouts[c].layout[i].zoom(1);
+        }
+	} 
+}
+
+function zoom_less(){
+	cardinal.x -= Math.round((cardinal.x - zoom.centerx)/2);
+	cardinal.y -= Math.round((cardinal.y - zoom.centery)/2);
+	for (let c = 0; c < layouts.length; c++){
+		for (let i = 0; i < layouts[c].index; i++){
+			layouts[c].layout[i].zoom(-1);
+		}
+	} 
 }
 
 
@@ -298,7 +326,9 @@ function DragZoom(){
             }
 
             cardinal.x = dragspace.carx - (dragspace.x - mspos.x);
-            cardinal.y = dragspace.cary - (dragspace.y - mspos.y);
+			cardinal.y = dragspace.cary - (dragspace.y - mspos.y);
+			zoom.centerx = cardinal.x + (tfmbg_width/2)*zoomvalue;
+			zoom.centery = cardinal.y + (tfmbg_height/2)*zoomvalue;
              
                  
     }
@@ -330,10 +360,10 @@ function DisplayJoints(showpts = true) {
         for (let c = 0; c < layouts.length; c++){
             for (let i = 0; i < layouts[c].index; i++) {
 
-                if (i === isEdit.selectindex) {
+                if (i === layouts[c].selectindex) {
                     layouts[c].layout[i].set_pointsalpha(1);
                 }
-                if ((layouts[c].layout[i].get_pointsalpha() === 1) && (i != isEdit.selectindex)) {
+                if ((layouts[c].layout[i].get_pointsalpha() === 1) && (i != layouts[c].selectindex)) {
                     layouts[c].layout[i].set_pointsalpha(0.75);
                 }
                 layouts[c].layout[i].displaypoints(showpoints.p1, showpoints.p2, showpoints.pc);
@@ -384,7 +414,7 @@ function SyncSettingsDOM() {
 		SelectColor = rgbvals;
 
 		if (!(rgbToHex(SelectColor.r, SelectColor.g, SelectColor.b).toUpperCase() === document.getElementById('selectcolorval').value)) {
-			layouts[current_layout].layout[isEdit.selectindex].set_color(SelectColor.r, SelectColor.g, SelectColor.b);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_color(SelectColor.r, SelectColor.g, SelectColor.b);
 		}
 
 		document.getElementById('directScolor').style.backgroundColor = rgbToHex(SelectColor.r, SelectColor.g, SelectColor.b);
@@ -400,7 +430,7 @@ function SyncSettingsDOM() {
 		SelectAlpha = $('#selectcolor').minicolors('opacity');
 
 		if (!(SelectAlpha === document.getElementById('selectalphaval').value)) {
-			layouts[current_layout].layout[isEdit.selectindex].set_alpha(SelectAlpha);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(SelectAlpha);
 		}
 
 		document.getElementById('directScolor').style.opacity = $('#selectcolor').minicolors('opacity');
@@ -413,22 +443,22 @@ function SyncSettingsDOM() {
 	// P1 AND P2 SETTINGS
 
 	if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) {
-		document.getElementById('p1x').value = layouts[current_layout].layout[isEdit.selectindex].get_p1().x - cardinal.x;
+		document.getElementById('p1x').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().x - cardinal.x;
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) {
-		document.getElementById('p1y').value = layouts[current_layout].layout[isEdit.selectindex].get_p1().y - cardinal.y;
+		document.getElementById('p1y').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().y - cardinal.y;
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) {
-		document.getElementById('p2x').value = layouts[current_layout].layout[isEdit.selectindex].get_p2().x - cardinal.x;
+		document.getElementById('p2x').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().x - cardinal.x;
 	}
 
 	if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) {
-		document.getElementById('p2y').value = layouts[current_layout].layout[isEdit.selectindex].get_p2().y - cardinal.y;
+		document.getElementById('p2y').value = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().y - cardinal.y;
 	}
 
-	document.getElementById('selectindex').value = Number(isEdit.selectindex); // SYNC INDEX
+	document.getElementById('selectindex').value = Number(layouts[current_layout].selectindex); // SYNC INDEX
 
 
 }
@@ -438,7 +468,7 @@ function Drawing() {
 		if (mouseIsPressed) {
 
 			if (locked === true && dragged === false && isDrawing === false) {
-				isEdit.selectindex = layouts[current_layout].index;
+				layouts[current_layout].selectindex = layouts[current_layout].index;
 				layouts[current_layout].layout[layouts[current_layout].index].set_color(DefaultColor.r, DefaultColor.g, DefaultColor.b); // DEFAULT SETTER
 				layouts[current_layout].layout[layouts[current_layout].index].set_alpha(DefaultAlpha);
 				layouts[current_layout].layout[layouts[current_layout].index].set_e(DefaultE);
@@ -505,12 +535,12 @@ function Drawing() {
 			$('#selectcolor').minicolors('value', rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b));
 			$('#selectcolor').minicolors('opacity', DefaultAlpha);
 
-			if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[isEdit.selectindex].foreground === false) { // SYNC FB
+			if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === false) { // SYNC FB
 				$("#selectbf").prop("checked", false);
-				layouts[current_layout].layout[isEdit.selectindex].foreground = false;
-			} else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[isEdit.selectindex].foreground === true) {
+				layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = false;
+			} else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === true) {
 				$("#selectbf").prop("checked", true);
-				layouts[current_layout].layout[isEdit.selectindex].foreground = true;
+				layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = true;
 			}
 		}
 	}
@@ -526,7 +556,7 @@ function Cursoring() {
 				Select.p = 1; // P1 
 				if ((locked === true) && (Select.state === true) && isEdit.state === false) {
 					isEdit.state = true;
-					isEdit.selectindex = i;
+					layouts[current_layout].selectindex = i;
 					isEdit.pnumber = 1;
 				}
 				break;
@@ -535,7 +565,7 @@ function Cursoring() {
 				Select.p = 2 // P2
 				if ((locked === true) && (Select.state === true) && isEdit.state === false) {
 					isEdit.state = true;
-					isEdit.selectindex = i;
+					layouts[current_layout].selectindex = i;
 					isEdit.pnumber = 2;
 				}
 				break;
@@ -544,7 +574,7 @@ function Cursoring() {
 				Select.p = 12 // PCENTER
 				if ((locked === true) && (Select.state === true) && isEdit.state === false) {
 					isEdit.state = true;
-					isEdit.selectindex = i;
+					layouts[current_layout].selectindex = i;
 					isEdit.pnumber = 12;
 				}
 				break;
@@ -569,52 +599,52 @@ function Editing() {
 
 
 		if (savealpha.state === false) { // SAUVEGARDE ALPHA INITIAL
-			savealpha.alpha = layouts[current_layout].layout[isEdit.selectindex].c.a;
+			savealpha.alpha = layouts[current_layout].layout[layouts[current_layout].selectindex].c.a;
 			savealpha.state = true;
 		}
 
 
 		if (isEdit.pnumber === 1) { // MOVE P1
-			layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
-			layouts[current_layout].layout[isEdit.selectindex].set_p1(mspos.x, mspos.y);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_p1(mspos.x, mspos.y);
 
 		} else if (isEdit.pnumber === 2) { // MOVE P2
-			layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
-			layouts[current_layout].layout[isEdit.selectindex].set_p2(mspos.x, mspos.y);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_p2(mspos.x, mspos.y);
 
 		} else if (isEdit.pnumber === 12) { // MOVE P1 AND P2
 
 			if (isEdit.taked === false) { // SAVE THE ORIGINAL POSITION
-				isEdit.p1pos = layouts[current_layout].layout[isEdit.selectindex].get_p1();
-				isEdit.p2pos = layouts[current_layout].layout[isEdit.selectindex].get_p2();
-				isEdit.pcenter = layouts[current_layout].layout[isEdit.selectindex].get_pc();
+				isEdit.p1pos = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1();
+				isEdit.p2pos = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2();
+				isEdit.pcenter = layouts[current_layout].layout[layouts[current_layout].selectindex].get_pc();
 				isEdit.taked = true;
 			} // CALC THE GAP BETWEEN THE MOUSEPOS AND THE ORIGINAL POSITION
-			layouts[current_layout].layout[isEdit.selectindex].set_alpha(0.5);
-			layouts[current_layout].layout[isEdit.selectindex].set_p1(Math.round(isEdit.p1pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p1pos.y - (isEdit.pcenter.y - mspos.y)));
-			layouts[current_layout].layout[isEdit.selectindex].set_p2(Math.round(isEdit.p2pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p2pos.y - (isEdit.pcenter.y - mspos.y)));
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_p1(Math.round(isEdit.p1pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p1pos.y - (isEdit.pcenter.y - mspos.y)));
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_p2(Math.round(isEdit.p2pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p2pos.y - (isEdit.pcenter.y - mspos.y)));
 
 		}
 		if (locked === false) {
 			isEdit.state = false;
 			isEdit.taked = false;
-			layouts[current_layout].layout[isEdit.selectindex].set_alpha(savealpha.alpha);
+			layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(savealpha.alpha);
 			savealpha.state = false;
 		}
 
 		// SYNC PARAM
-		$('#selectcolor').minicolors('value', rgbToHex(layouts[current_layout].layout[isEdit.selectindex].c.r, layouts[current_layout].layout[isEdit.selectindex].c.g, layouts[current_layout].layout[isEdit.selectindex].c.b).substring(1));
+		$('#selectcolor').minicolors('value', rgbToHex(layouts[current_layout].layout[layouts[current_layout].selectindex].c.r, layouts[current_layout].layout[layouts[current_layout].selectindex].c.g, layouts[current_layout].layout[layouts[current_layout].selectindex].c.b).substring(1));
 		$('#selectcolor').minicolors('opacity', savealpha.alpha);
 
-		updateSelecteInput(layouts[current_layout].layout[isEdit.selectindex].e);
-		updateSelecteSlider(layouts[current_layout].layout[isEdit.selectindex].e);
+		updateSelecteInput(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
+		updateSelecteSlider(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
 
-		if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[isEdit.selectindex].foreground === false) { // SYNC FB 
+		if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === false) { // SYNC FB 
 			$("#selectbf").prop("checked", false);
-			layouts[current_layout].layout[isEdit.selectindex].foreground = false;
-		} else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[isEdit.selectindex].foreground === true) {
+			layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = false;
+		} else if (document.getElementById('selectbf').checked === false && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === true) {
 			$("#selectbf").prop("checked", true);
-			layouts[current_layout].layout[isEdit.selectindex].foreground = true;
+			layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = true;
 		}
 	}
 }
@@ -623,7 +653,7 @@ function Editing() {
 function deletejoint() {
 	if (isDrawing === false) {
 
-		let indexcompt = isEdit.selectindex;
+		let indexcompt = layouts[current_layout].selectindex;
 		while (indexcompt < layouts[current_layout].index) {
 			copyjoint(layouts[current_layout].layout[indexcompt], layouts[current_layout].layout[indexcompt + 1]);
 			indexcompt++;
@@ -632,7 +662,7 @@ function deletejoint() {
 			layouts[current_layout].down_index();
 		}
 		if (layouts[current_layout].index >= 1) {
-			isEdit.selectindex = layouts[current_layout].index - 1;
+			layouts[current_layout].selectindex = layouts[current_layout].index - 1;
 		}
 
 		Select.state = false;
@@ -642,8 +672,8 @@ function deletejoint() {
 function duplicatejoint() {
 	if (isDrawing === false) {
 		if (layouts[current_layout].index > 0) {
-			copyjoint(layouts[current_layout].layout[layouts[current_layout].index], layouts[current_layout].layout[isEdit.selectindex], 40);
-			isEdit.selectindex = layouts[current_layout].index;
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].index], layouts[current_layout].layout[layouts[current_layout].selectindex], 40);
+			layouts[current_layout].selectindex = layouts[current_layout].index;
 			layouts[current_layout].up_index();
 		}
 
@@ -655,12 +685,12 @@ function duplicatejoint() {
 
 function zplus() {
 	if (isDrawing === false) {
-		if ((isEdit.selectindex >= 0) && (isEdit.selectindex < layouts[current_layout].index - 1)) {
+		if ((layouts[current_layout].selectindex >= 0) && (layouts[current_layout].selectindex < layouts[current_layout].index - 1)) {
 			let save = new Joints();
-			copyjoint(save, layouts[current_layout].layout[isEdit.selectindex + 1]);
-			copyjoint(layouts[current_layout].layout[isEdit.selectindex + 1], layouts[current_layout].layout[isEdit.selectindex]);
-			copyjoint(layouts[current_layout].layout[isEdit.selectindex], save);
-			isEdit.selectindex++;
+			copyjoint(save, layouts[current_layout].layout[layouts[current_layout].selectindex + 1]);
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].selectindex + 1], layouts[current_layout].layout[layouts[current_layout].selectindex]);
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].selectindex], save);
+			layouts[current_layout].selectindex++;
 		}
 
 	}
@@ -668,12 +698,12 @@ function zplus() {
 
 function zminus() {
 	if (isDrawing === false) {
-		if ((isEdit.selectindex > 0) && (isEdit.selectindex < layouts[current_layout].index)) {
+		if ((layouts[current_layout].selectindex > 0) && (layouts[current_layout].selectindex < layouts[current_layout].index)) {
 			let save = new Joints();
-			copyjoint(save, layouts[current_layout].layout[isEdit.selectindex - 1]);
-			copyjoint(layouts[current_layout].layout[isEdit.selectindex - 1], layouts[current_layout].layout[isEdit.selectindex]);
-			copyjoint(layouts[current_layout].layout[isEdit.selectindex], save);
-			isEdit.selectindex--;
+			copyjoint(save, layouts[current_layout].layout[layouts[current_layout].selectindex - 1]);
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].selectindex - 1], layouts[current_layout].layout[layouts[current_layout].selectindex]);
+			copyjoint(layouts[current_layout].layout[layouts[current_layout].selectindex], save);
+			layouts[current_layout].selectindex--;
 		}
 	}
 }
@@ -688,9 +718,10 @@ function copyjoint(ele, ele2, move_x = 0, move_y = 0) {
 
 function resetpos(){ // DETERMINE THE DISTANCE BETWEEN THE ACTUAL CARDINAL AND THE ORIGINAL AND APPLY THE DISTANCE TO COME BACK, should edit with resize canvas the original one
     let dist = {x:cardinal.x - originalcardinal.x ,y:cardinal.y - originalcardinal.y};
-    console.log(originalcardinal, cardinal, dist);
-    cardinal.x = cardinal.x - dist.x;
-    cardinal.y = cardinal.y - dist.y;
+    cardinal.x = cardinal.x - dist.x; // NEED TO FIX THE GAP WHEN YOU RESET WITH SCROLL, DOESNT MATTER TOO MUCH BUT NOT SATISFTYING
+	cardinal.y = cardinal.y - dist.y;
+	zoom.centerx = cardinal.x + (tfmbg_width/2)*zoomvalue;
+	zoom.centery = cardinal.y + (tfmbg_height/2)*zoomvalue;
 
     for (let c = 0; c < layouts.length; c++){
         for (let i = 0; i < layouts[c].index; i++){
@@ -728,11 +759,12 @@ function displaytfmbg(width, height, visible = true) {
 		stroke('#878FAA');
 		strokeWeight(5);
 		fill(bgcolor);
-		rect(cardinal.x, cardinal.y +200 - height / 2, width, height);
+		rect(zoom.centerx - (zoom.centerx - cardinal.x) , zoom.centery -(zoom.centery - cardinal.y), width*zoomvalue,height*zoomvalue);
 		fill('#878FAA');
-		rect(cardinal.x, cardinal.y +200 - height / 2, width, 20)
+		rect(zoom.centerx - (zoom.centerx - cardinal.x) , zoom.centery -(zoom.centery - cardinal.y), width*zoomvalue,20*zoomvalue);
 		fill('#878FAA');
-		rect(cardinal.x, cardinal.y + 200 + height / 2, width, 200)
+		rect(zoom.centerx - (zoom.centerx - cardinal.x) , zoom.centery -(zoom.centery - cardinal.y)+height*zoomvalue, width*zoomvalue,200*zoomvalue);
+		
 	}
 
 }
@@ -776,7 +808,7 @@ function updateDefaulteSlider(val) {
 // SELECT
 function updateSelecteInput(val) {
 	document.getElementById('selectevalin').value = val;
-	layouts[current_layout].layout[isEdit.selectindex].set_e(val);
+	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
 }
 
 function updateSelecteSlider(val) {
@@ -790,24 +822,24 @@ function updateSelecteSlider(val) {
 		val = 1;
 	}
 	document.getElementById('selecteval').value = val;
-	layouts[current_layout].layout[isEdit.selectindex].set_e(val);
+	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
 }
 
 // P1 
 function updateP1x(val) {
-	layouts[current_layout].layout[isEdit.selectindex].x1 = Number(val) + cardinal.x;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x1 = Number(val) + cardinal.x;
 }
 
 function updateP1y(val) {
-	layouts[current_layout].layout[isEdit.selectindex].y1 = Number(val) + cardinal.y;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y1 = Number(val) + cardinal.y;
 }
 
 function updateP2x(val) {
-	layouts[current_layout].layout[isEdit.selectindex].x2 = Number(val) + cardinal.x;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x2 = Number(val) + cardinal.x;
 }
 
 function updateP2y(val) {
-	layouts[current_layout].layout[isEdit.selectindex].y2 = Number(val) + cardinal.y;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y2 = Number(val) + cardinal.y;
 }
 
 function updatebf() {
@@ -820,7 +852,7 @@ function updatebf() {
 
 function updatesbf() {
 	let state = document.getElementById('selectbf').checked;
-	layouts[current_layout].layout[isEdit.selectindex].set_foreground(state);
+	layouts[current_layout].layout[layouts[current_layout].selectindex].set_foreground(state);
 }
 
 
@@ -933,7 +965,7 @@ function loadxml() {
 
 		} // END FOR
 
-        isEdit.selectindex = XML.length+layouts[current_layout].index-1;
+        layouts[current_layout].selectindex = XML.length+layouts[current_layout].index-1;
 		layouts[current_layout].index = XML.length+layouts[current_layout].index;
 		
 
@@ -952,7 +984,7 @@ function loadxml() {
 function clearAll(){
     if (confirm("Are you sure to delete all ?")){
         layouts[current_layout].set_index(0);
-        isEdit.selectindex = 0;
+        layouts[current_layout].selectindex = 0;
 
         for (let c = 0; c < layouts.length; c++){
             for (let i = 0; i < layouts[c].length; i++){
@@ -1130,7 +1162,8 @@ class Layouts { // layouts[current_layout].layout[value]
 		this.layout = [];
 		this.type;
 		this.name;
-        this.index = 0;
+		this.index = 0;
+		this.selectindex = 0;
 	}
 
 	create_layout(type = "jts") { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
