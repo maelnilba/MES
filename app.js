@@ -1,6 +1,6 @@
 // TODO -------------------
 // LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y  AND VISUAL SETTINGS
-// ZOOM 
+// ZOOM - NEED FIX SOMES ISSUES
 
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
@@ -130,6 +130,12 @@ function setup() {
         carx:0,
         cary:0
     };
+
+    zoom = {
+        step:0,
+        centerx: Math.round(windowWidth/2),
+        centery: Math.round(windowHeight/2)
+    };
 }
 
 
@@ -152,8 +158,7 @@ function draw() {
 
 
 	// console.log(); // FOR NOOB TESTING
-
-    
+ 
         
     
 }
@@ -196,6 +201,28 @@ function keyReleased(){
 
 }
 
+function mouseWheel(event) { // ZOOM      - NEED FIX SOMES ISSUES
+    if (event.delta > 0 && zoom.step > -3){ // -
+            zoom.step--;
+            cardinal.x -= Math.round((cardinal.x - zoom.centerx)/2)+200;
+            cardinal.y -= Math.round((cardinal.y - zoom.centery)/2)+100;
+        for (let c = 0; c < layouts.length; c++){
+            for (let i = 0; i < layouts[c].index; i++){
+                layouts[c].layout[i].zoom(-1);
+            }
+        } 
+    } else if (event.delta < 0 && zoom.step < 3) { // +
+            zoom.step++;
+            cardinal.x += (cardinal.x - zoom.centerx)+400;
+            cardinal.y += (cardinal.y - zoom.centery)+200;
+        for (let c = 0; c < layouts.length; c++){
+            for (let i = 0; i < layouts[c].index; i++){
+                layouts[c].layout[i].zoom(1);
+            }
+        } 
+    }
+
+}
 
 
 
@@ -1073,7 +1100,26 @@ class Joints {
 		line(this.x1, this.y1, this.x2, this.y2);
 
 
-	}
+    }
+    
+    zoom(value){
+            // CALCUL LA DISTANCE ENTRE LE POINT CENTRALE ET LA MULTPILIE ??
+        if (value > 0){ // +
+            this.x1 += this.x1 - zoom.centerx;
+            this.x2 += this.x2 - zoom.centerx;
+            this.y1 += this.y1 - zoom.centery;
+            this.y2 += this.y2 - zoom.centery;
+            this.e *= 2;
+        }
+        else { // -
+            this.x1 -= Math.round((this.x1 - zoom.centerx)/2);
+            this.x2 -= Math.round((this.x2 - zoom.centerx)/2);
+            this.y1 -= Math.round((this.y1 - zoom.centery)/2);
+            this.y2 -= Math.round((this.y2 - zoom.centery)/2);
+            this.e /= 2;
+        }
+            
+    }
 
 
 }
