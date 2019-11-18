@@ -126,10 +126,6 @@ function setup() {
         cary:0
     };
 	zoomvalue = 1;
-	const originalc = {
-		centerx: cardinal.x+((tfmbg_width/2)*zoomvalue),
-		centery: cardinal.y+((tfmbg_height/2)*zoomvalue),
-	};
     zoom = {
         step:0,
         centerx: cardinal.x+((tfmbg_width/2)*zoomvalue),
@@ -190,11 +186,11 @@ function keyTyped() {
 			apply_zoom(125);
 		}
 
-		if ((key === '0')){
+		if ((key === 't') || (key === 'T')){
 			resetzoom();
 		}
 
-		if ((key === '1')){
+		if ((key === '&')){
 			if (showpoints.p1 === true){
 				showpoints.p1 = false;
 			} else {
@@ -202,7 +198,7 @@ function keyTyped() {
 			}
 		}
 
-		if ((key === '2')){
+		if ((key === '"')){
 			if (showpoints.p2 === true){
 				showpoints.p2 = false;
 			} else {
@@ -210,7 +206,7 @@ function keyTyped() {
 			}
 		}
 
-		if ((key === '3')){
+		if ((key === 'é')){
 			if (showpoints.pc === true){
 				showpoints.pc = false;
 			} else {
@@ -337,10 +333,12 @@ function apply_zoom(value){
 		zoom_less();
 		zoom.step--; 
 		zoomvalue /= 2;
+		DefaultE = DefaultE / 2;
 	} else if (value > 0 && zoom.step < 2) { // +
 		zoom_more();
 		zoom.step++;
 		zoomvalue *=2;
+		DefaultE = DefaultE * 2;
 	}
 
 	if (zoom.step > 2){
@@ -348,6 +346,7 @@ function apply_zoom(value){
 	} else if (zoom.step < -2){
 	zoom.step = -2;
 	}
+	
 }
 
 function zoom_more(){
@@ -839,14 +838,7 @@ function updateDefaulteInput(val) {
 
 function updateDefaulteSlider(val) {
 	val = Number(val);
-	if (!(Number.isInteger(val))) {
-		val = 2;
-	}
-	if (val > 260) {
-		val = 260;
-	} else if (val < 1) {
-		val = 1;
-	}
+
 	document.getElementById('defaulteval').value = val;
 	DefaultE = val;
 }
@@ -854,21 +846,16 @@ function updateDefaulteSlider(val) {
 
 // SELECT
 function updateSelecteInput(val) {
-	document.getElementById('selectevalin').value = val;
+	val = Number(val);
+
+	document.getElementById('selectevalin').value = val / zoomvalue;
 	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
 }
 
 function updateSelecteSlider(val) {
 	val = Number(val);
-	if (!(Number.isInteger(val))) {
-		val = 2;
-	}
-	if (val > 260) {
-		val = 260;
-	} else if (val < 1) {
-		val = 1;
-	}
-	document.getElementById('selecteval').value = val;
+
+	document.getElementById('selecteval').value = val / zoomvalue;
 	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
 }
 
@@ -929,8 +916,8 @@ function savexml() {
 
 // <JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/>
 function loadxml() {
-	resetpos();
 	resetzoom();
+	resetpos();
 
 	let XML = document.getElementById('load-xml').value;
 	let JD;

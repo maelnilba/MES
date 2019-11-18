@@ -51,8 +51,8 @@
                 </li>
                 <li class="item-color">
                     <label class="thickness">Thickness : &nbsp;</label>
-                    <input type="range" id="defaulteval" min="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1">
-                    <input type="text" id="defaultevalin" oninput="updateDefaulteSlider(this.value);" value="">
+                    <input type="range" id="defaulteval" min="1" step="1" max="260" oninput="updateDefaulteInput(this.value);" value="2" step="1">
+                    <input type="text" id="defaultevalin" step="1" oninput="updateDefaulteSlider(this.value);" value="">
                 </li>
                 <li>
                     <span class="linebold"></span>
@@ -80,8 +80,8 @@
                 </li>
                 <li class="item-color">
                     <label class="thickness">Thickness : &nbsp;</label>
-                    <input type="range" id="selecteval" min="1" max="260" oninput="updateSelecteInput(this.value);" value="2" step="1">
-                    <input type="text" id="selectevalin" oninput="updateSelecteSlider(this.value);" value="">
+                    <input type="range" id="selecteval" min="1" step="1" max="260" oninput="updateSelecteInput(this.value);" value="2" step="1">
+                    <input type="text" id="selectevalin" step="1" oninput="updateSelecteSlider(this.value);" value="">
                 </li>
                 <li class="item-color">
                     <label class="pinfo">P1 :</label>
@@ -137,7 +137,7 @@
                     <input class="load-xml" type="button" onclick="loadxml();" value="LOAD XML">
                 </li>
                 <li class="item-color">
-                    <textarea id="load-xml" name="load-xml" rows="7" cols="30"></textarea>
+                    <textarea id="load-xml" onclick="this.focus();this.select()" name="load-xml" rows="7" cols="30"></textarea>
                 </li>
                 <li class="item-color">
                         <span class="linebold"></span>
