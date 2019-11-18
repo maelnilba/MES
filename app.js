@@ -874,19 +874,19 @@ function updateSelecteSlider(val) {
 
 // P1 
 function updateP1x(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].x1 = (Number(val) + cardinal.x)*zoomvalue;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x1 = (Number(val) + cardinal.x);
 }
 
 function updateP1y(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].y1 = (Number(val) + cardinal.y)*zoomvalue;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y1 = (Number(val) + cardinal.y);
 }
 
 function updateP2x(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].x2 = (Number(val) + cardinal.x)*zoomvalue;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].x2 = (Number(val) + cardinal.x);
 }
 
 function updateP2y(val) {
-	layouts[current_layout].layout[layouts[current_layout].selectindex].y2 = (Number(val) + cardinal.y)*zoomvalue;
+	layouts[current_layout].layout[layouts[current_layout].selectindex].y2 = (Number(val) + cardinal.y);
 }
 
 function updatebf() {
