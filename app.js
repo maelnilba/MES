@@ -22,14 +22,14 @@ const originalcardinal = {
 
 // SETUP -------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
-    drawcanvas = createCanvas(windowWidth, windowHeight); // BG
+	drawcanvas = createCanvas(windowWidth, windowHeight); // BG
 	background(106, 116, 149); // BG COLOR
 	bgcolor = color(106, 116, 149);
-	current_layout = 0;
+	current_layout = -1;
+	createDivLayout(current_layout);
 	// CREATE LAYOUT 
 	// layouts[current_layout].layout[value] = joint
-	layouts.push(new Layouts());
-	layouts[current_layout].create_layout();
+
 
 	locked = false;
 	dragged = false; // VAR MOUSEACTIONS
@@ -133,6 +133,7 @@ function setup() {
 	};
 	
 	background(106, 116, 149); // 
+
 }
 
 
@@ -155,8 +156,15 @@ function draw() {
 
 
 	// console.log(); // FOR NOOB TESTING
-	console.log((zoom.step));
- 
+	console.log(layouts);
+
+	for (let c = 0; c < layouts.length;c++){
+		if (document.getElementById("btn_on_off"+c).checked){
+			layouts[c].setvisible(false);
+		} else {
+			layouts[c].setvisible(true);
+		}
+	}
         
     
 }
@@ -212,6 +220,14 @@ function keyTyped() {
 			} else {
 				showpoints.pc = true;
 			}
+		}
+
+		if ((key === "a" || key === 'A')){
+			createDivLayout(current_layout);
+		}
+		if ((key === "q" || key === 'Q')){
+			deleteDivLayout(current_layout);
+			
 		}
 	}
 }
@@ -386,17 +402,23 @@ function DisplayJoints(showpts = true) {
 	displaytfmbg(tfmbg_width, tfmbg_height); // MAP BG
 
     for (let c = 0; c < layouts.length; c++){
-        for (let i = 0; i < layouts[c].index; i++) {
-            if (layouts[c].layout[i].foreground === false) {
-                layouts[c].layout[i].display();
-            }
+		if (layouts[c].visible){
+			for (let i = 0; i < layouts[c].index; i++) {
+				if (layouts[c].layout[i].foreground === false) {
+					layouts[c].layout[i].display();
+				}
 
-        }
+			}
+		}
+        
 
         for (let i = 0; i < layouts[c].index; i++) {
-            if (layouts[c].layout[i].foreground === true) {
-                layouts[c].layout[i].display();
-            }
+			if (layouts[c].visible){
+				if (layouts[c].layout[i].foreground === true) {
+					layouts[c].layout[i].display();
+				}
+			}
+            
 
         }
     }
@@ -404,17 +426,20 @@ function DisplayJoints(showpts = true) {
 
 	if (showpts) {
         for (let c = 0; c < layouts.length; c++){
-            for (let i = 0; i < layouts[c].index; i++) {
+			if (layouts[c].visible){
+						for (let i = 0; i < layouts[c].index; i++) {
 
-                if (i === layouts[c].selectindex) {
-                    layouts[c].layout[i].set_pointsalpha(1);
-                }
-                if ((layouts[c].layout[i].get_pointsalpha() === 1) && (i != layouts[c].selectindex)) {
-                    layouts[c].layout[i].set_pointsalpha(0.75);
-                }
-                layouts[c].layout[i].displaypoints(showpoints.p1, showpoints.p2, showpoints.pc);
-            } 
-        }
+						if (i === layouts[c].selectindex) {
+							layouts[c].layout[i].set_pointsalpha(1);
+						}
+						if ((layouts[c].layout[i].get_pointsalpha() === 1) && (i != layouts[c].selectindex)) {
+							layouts[c].layout[i].set_pointsalpha(0.75);
+						}
+						layouts[c].layout[i].displaypoints(showpoints.p1, showpoints.p2, showpoints.pc);
+					} 
+				}
+			}
+            
 		
 	}
 
@@ -526,8 +551,11 @@ function Drawing() {
 			}
 			if (locked === true && dragged === true && isDrawing === true) {
 				layouts[current_layout].layout[layouts[current_layout].index].set_p2(mspos.x, mspos.y);
-				layouts[current_layout].layout[layouts[current_layout].index].display();
-				layouts[current_layout].layout[layouts[current_layout].index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED                    
+				if (layouts[current_layout].visible) {
+					layouts[current_layout].layout[layouts[current_layout].index].display();
+					layouts[current_layout].layout[layouts[current_layout].index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED   
+				}
+                 
 			}
 		}
 
@@ -536,8 +564,8 @@ function Drawing() {
 			layouts[current_layout].up_index();
 
 			// HISTORY COLORS SET
-			updateSelecteInput(DefaultE); // SYNC PARAM
-			updateSelecteSlider(DefaultE);
+			updateSelecteSI(DefaultE); // SYNC PARAM
+			
 
 			if (swatchesindex.z === 0) {
 				swatchesindex.previous = 6;
@@ -682,8 +710,8 @@ function Editing() {
 		$('#selectcolor').minicolors('value', rgbToHex(layouts[current_layout].layout[layouts[current_layout].selectindex].c.r, layouts[current_layout].layout[layouts[current_layout].selectindex].c.g, layouts[current_layout].layout[layouts[current_layout].selectindex].c.b).substring(1));
 		$('#selectcolor').minicolors('opacity', savealpha.alpha);
 
-		updateSelecteInput(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
-		updateSelecteSlider(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
+		updateSelecteSI(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
+		
 
 		if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === false) { // SYNC FB 
 			$("#selectbf").prop("checked", false);
@@ -755,8 +783,8 @@ function zminus() {
 }
 
 function copyjoint(ele, ele2, move_x = 0, move_y = 0) {
-	ele.set_p1(ele2.x1 + move_x, ele2.y1 + move_y);
-	ele.set_p2(ele2.x2 + move_x, ele2.y2 + move_y);
+	ele.set_p1(ele2.x1 + move_x*zoomvalue, ele2.y1 + move_y*zoomvalue);
+	ele.set_p2(ele2.x2 + move_x*zoomvalue, ele2.y2 + move_y*zoomvalue);
 	ele.set_color(ele2.c.r, ele2.c.g, ele2.c.b);
 	ele.set_e(ele2.e);
 	ele.set_alpha(ele2.c.a);
@@ -826,38 +854,91 @@ function opensettings(setchoose) { // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
 
 }
 
+function changelayout() {
+
+	isEdit = {
+		state: false,
+		pnumber: 0,
+		taked: false,
+		p1pos: 0,
+		p2pos: 0,
+		pcenter: 0
+	};
+
+	Select = {
+		state: false,
+		p: 0
+	};
+}
 
 // DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
+function createDivLayout(cl){
+	changelayout();
+	current_layout++;
+	cl++;
 
+	layouts.push(new Layouts());
+	layouts[cl].create_layout();
+	let div = document.createElement("DIV");  
+	div.id = "layout" + cl;
+	div.className = "layouts";      
+	div.style.width = "200px";
+	document.getElementById("layout-settings").appendChild(div); //
+	document.getElementById("layout" + cl).appendChild(document.createTextNode("layout " + cl));
+                     
+
+	let btn_on_off = document.createElement('input');
+	btn_on_off.type = "checkbox";
+	btn_on_off.value = "On";
+	btn_on_off.id = "btn_on_off"+cl;
+	document.getElementById("layout" + cl).appendChild(btn_on_off); //
+	let btn_up = document.createElement('input');
+	btn_up.type = "button";
+	btn_up.value = "^";
+	btn_up.id = "btn_up"+cl;
+	document.getElementById("layout" + cl).appendChild(btn_up); //
+	let btn_down = document.createElement('input');
+	btn_down.type = "button";
+	btn_down.value = "v";
+	btn_down.id = "btn_down"+cl;
+	document.getElementById("layout" + cl).appendChild(btn_down); //
+}
+function deleteDivLayout(cl){
+	if (cl > 0){
+		changelayout();
+		document.getElementById("layout"+cl).outerHTML = ""; // DELETE THE DIV
+		layouts.splice(cl,1); // DELETE FROM LAYOUT ARRAY
+		current_layout--;
+	}
+}
+
+	
 
 // DEFAULT
-function updateDefaulteInput(val) {
+function updateDefaulteSI(val) {
 	document.getElementById('defaultevalin').value = val;
-	DefaultE = val;
-}
-
-function updateDefaulteSlider(val) {
-	val = Number(val);
-
 	document.getElementById('defaulteval').value = val;
+
+}
+
+function setDefaulteSI(val){
 	DefaultE = val;
 }
+
+
 
 
 // SELECT
-function updateSelecteInput(val) {
+function updateSelecteSI(val) {
 	val = Number(val);
+	document.getElementById('selectevalin').value = val;
+	document.getElementById('selecteval').value = val;
+}
 
-	document.getElementById('selectevalin').value = val / zoomvalue;
+function setSelecteSI(val){
 	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
 }
 
-function updateSelecteSlider(val) {
-	val = Number(val);
-
-	document.getElementById('selecteval').value = val / zoomvalue;
-	layouts[current_layout].layout[layouts[current_layout].selectindex].set_e(val);
-}
 
 // P1 
 function updateP1x(val) {
@@ -1201,6 +1282,7 @@ class Layouts { // layouts[current_layout].layout[value]
 		this.name;
 		this.index = 0;
 		this.selectindex = 0;
+		this.visible = true;
 	}
 
 	create_layout(type = "jts") { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
@@ -1233,6 +1315,10 @@ class Layouts { // layouts[current_layout].layout[value]
 
     down_index(){
         this.index = this.index - 1;
-    }
+	}
+	
+	setvisible(bool){
+		this.visible = bool;
+	}
 
 }
