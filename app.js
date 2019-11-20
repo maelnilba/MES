@@ -148,6 +148,10 @@ function draw() {
 		}
 	} 
 
+	for (let c = layouts.length - 1; c >= 0; c-- ){ // DRAW LAYOUTS DIV IN REVERSE
+		layouts[c].div.style.top = String(40+(Math.abs(c-layouts.length))*40) + "px";
+	}
+
 	// MAIN
 	if (document.getElementById('show-draw-settings').checked) { // IF USERS OPEN DRAW EDITOR
 		DisplayJoints(); // DISPLAY ALL JOINTS
@@ -163,7 +167,6 @@ function draw() {
 
 	// console.log(); // FOR NOOB TESTING
 
-	console.log(layouts);
 	
 
 
@@ -884,15 +887,24 @@ function createDivLayout(cur_l){
 	layouts[cur_l].createDiv();
 }
 
+function getLayoutPos(id) {
+	for (let p = 0; p < layouts.length; p++){
+		if (layouts[p].id === Number(id)){
+			return p;
+		}
+	}
+}
+
 function LayoutDown(layout_id){
 		let layout_save = new Layouts(999);
-		let id = layouts[layout_id].id;
-		let min_id = layouts[0].id;
+		let id = getLayoutPos(layout_id);
+		let min_id = Number(layouts[0].id);
 
-		if (!(id === min_id)){
-			layout_save = layouts[layout_id];
-			layouts[layout_id] = layouts[Number(layout_id)-1];
-			layouts[Number(layout_id)-1] = layout_save;
+		if (!(Number(layouts[id].id) === min_id)){
+			layout_save = layouts[id];
+			layouts[id] = layouts[Number(id)-1];
+			layouts[Number(id)-1] = layout_save;
+
 		}
 		
 			
@@ -903,14 +915,16 @@ function LayoutDown(layout_id){
 
 function LayoutUp(layout_id){
 		let layout_save = new Layouts(999);
-		let id = layouts[layout_id].id;
-		let max_id = layouts[layouts.length-1].id;
+		let id = getLayoutPos(layout_id);
+		let max_id = Number(layouts[layouts.length-1].id);
 		
-		if (!(id === max_id)){
-			layout_save = layouts[layout_id];
-			layouts[layout_id] = layouts[Number(layout_id)+1];
-			layouts[Number(layout_id)+1] = layout_save;
+		if (!(Number(layouts[id].id) === max_id)){
+			layout_save = layouts[id];
+			layouts[id] = layouts[Number(id)+1];
+			layouts[Number(id)+1] = layout_save;
+			
 		}
+
 
 		
 			
@@ -1344,6 +1358,8 @@ class Layouts { // layouts[current_layout].layout[value]
 	this.div.id = "layout" + this.id;
 	this.div.className = "layouts";      
 	this.div.style.width = "200px";
+	this.div.style.height = "40px";
+	this.div.style.position = "absolute";
 	document.getElementById("layout-settings").appendChild(this.div); //
 	document.getElementById("layout" + this.id).appendChild(document.createTextNode("layout " + this.id));
                      
