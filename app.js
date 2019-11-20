@@ -140,6 +140,13 @@ function setup() {
 
 function draw() {
 
+	for (let c = 0; c < layouts.length;c++){
+		if (document.getElementById("btn_on_off"+c).checked){
+			layouts[c].setvisible(false);
+		} else {
+			layouts[c].setvisible(true);
+		}
+	} 
 
 	// MAIN
 	if (document.getElementById('show-draw-settings').checked) { // IF USERS OPEN DRAW EDITOR
@@ -156,13 +163,10 @@ function draw() {
 
 	// console.log(); // FOR NOOB TESTING
 
-	for (let c = 0; c < layouts.length;c++){
-		if (document.getElementById("btn_on_off"+c).checked){
-			layouts[c].setvisible(false);
-		} else {
-			layouts[c].setvisible(true);
-		}
-	} 
+	console.log(layouts);
+	
+
+
         
     
 }
@@ -880,6 +884,40 @@ function createDivLayout(cur_l){
 	layouts[cur_l].createDiv();
 }
 
+function LayoutDown(layout_id){
+		let layout_save = new Layouts(999);
+		let id = layouts[layout_id].id;
+		let min_id = layouts[0].id;
+
+		if (!(id === min_id)){
+			layout_save = layouts[layout_id];
+			layouts[layout_id] = layouts[Number(layout_id)-1];
+			layouts[Number(layout_id)-1] = layout_save;
+		}
+		
+			
+
+			
+		
+}
+
+function LayoutUp(layout_id){
+		let layout_save = new Layouts(999);
+		let id = layouts[layout_id].id;
+		let max_id = layouts[layouts.length-1].id;
+		
+		if (!(id === max_id)){
+			layout_save = layouts[layout_id];
+			layouts[layout_id] = layouts[Number(layout_id)+1];
+			layouts[Number(layout_id)+1] = layout_save;
+		}
+
+		
+			
+
+		
+}
+
 function deleteDivLayout(cur_l){
 	if (layouts.length > 1){
 		changelayout();
@@ -1260,6 +1298,9 @@ class Layouts { // layouts[current_layout].layout[value]
 		this.selectindex = 0;
 		this.visible = true;
 		this.div;
+		this.btn_on_off;
+		this.btn_up;
+		this.btn_down;
 	}
 
 	create_layout() { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
@@ -1307,47 +1348,30 @@ class Layouts { // layouts[current_layout].layout[value]
 	document.getElementById("layout" + this.id).appendChild(document.createTextNode("layout " + this.id));
                      
 
-	let btn_on_off = document.createElement('input');
-	btn_on_off.type = "checkbox";
-	btn_on_off.value = "On";
-	btn_on_off.id = "btn_on_off"+this.id;
-	document.getElementById("layout" + this.id).appendChild(btn_on_off); //
-	let btn_up = document.createElement('input');
-	btn_up.type = "button";
-	btn_up.value = "^";
-	btn_up.id = "btn_up"+this.id;
-	btn_up.onclick = function () { // EDIT
-			let layout1 = cl;
-			let layout2;
-			let permut = new Layouts();
-			if (!(layout1 === layouts.length)){
-			layout2 = layout1+1;
-			permut = layouts[layout1];
-			layouts[layout1] = layouts[layout2];
-			layouts[layout2] = permut;
-			changelayout();
+	this.btn_on_off = document.createElement('input');
+	this.btn_on_off.type = "checkbox";
+	this.btn_on_off.value = "On";
+	this.btn_on_off.id = "btn_on_off"+this.id;
+	document.getElementById("layout" + this.id).appendChild(this.btn_on_off); //
+	this.btn_up = document.createElement('input');
+	this.btn_up.type = "button";
+	this.btn_up.value = "^";
+	this.btn_up.id = "btn_up"+this.id;
+	this.btn_up.onclick = function () { 
+			LayoutUp(this.id.replace("btn_up",""));
 		}
-		
-	}
-	document.getElementById("layout" + this.id).appendChild(btn_up); //
-	let btn_down = document.createElement('input');
-	btn_down.type = "button";
-	btn_down.value = "v";
-	btn_down.id = "btn_down"+this.id;
-	btn_down.onclick = function () { // edit
-		let layout1 = cl;
-		let layout2;
-		let permut = new Layouts();
-		if (!(layout1 === 0 )){
-			layout2 = layout1-1;
-			permut = layouts[layout1];
-			layouts[layout1] = layouts[layout2];
-			layouts[layout2] = permut;
-			
+
+	document.getElementById("layout" + this.id).appendChild(this.btn_up); //
+
+	this.btn_down = document.createElement('input');
+	this.btn_down.type = "button";
+	this.btn_down.value = "v";
+	this.btn_down.id = "btn_down"+this.id;
+	this.btn_down.onclick = function () { 
+			LayoutDown(this.id.replace("btn_down",""));
 		}
-		
-	}
-	document.getElementById("layout" + this.id).appendChild(btn_down); //
+
+	document.getElementById("layout" + this.id).appendChild(this.btn_down); //
 	}
 
 }
