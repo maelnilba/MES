@@ -25,10 +25,9 @@ function setup() {
 	drawcanvas = createCanvas(windowWidth, windowHeight); // BG
 	background(106, 116, 149); // BG COLOR
 	bgcolor = color(106, 116, 149);
-	current_layout = -1;
+	current_layout = 0;
 	createDivLayout(current_layout);
 	// CREATE LAYOUT 
-	// layouts[current_layout].layout[value] = joint
 
 
 	locked = false;
@@ -156,7 +155,6 @@ function draw() {
 
 
 	// console.log(); // FOR NOOB TESTING
-	console.log(layouts);
 
 	for (let c = 0; c < layouts.length;c++){
 		if (document.getElementById("btn_on_off"+c).checked){
@@ -164,7 +162,7 @@ function draw() {
 		} else {
 			layouts[c].setvisible(true);
 		}
-	}
+	} 
         
     
 }
@@ -223,6 +221,7 @@ function keyTyped() {
 		}
 
 		if ((key === "a" || key === 'A')){
+			current_layout++;
 			createDivLayout(current_layout);
 		}
 		if ((key === "q" || key === 'Q')){
@@ -854,7 +853,7 @@ function opensettings(setchoose) { // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
 
 }
 
-function changelayout() {
+function changelayout() { // RESET SELECTED VALUE NOT ATTRIBUATE TO LAYOUTS CLASS
 
 	isEdit = {
 		state: false,
@@ -872,42 +871,20 @@ function changelayout() {
 }
 
 // DOM FUNCTIONS ---------------------------------------------------------------------------------------------------------------------------------
-function createDivLayout(cl){
+
+function createDivLayout(cur_l){
 	changelayout();
-	current_layout++;
-	cl++;
-
-	layouts.push(new Layouts());
-	layouts[cl].create_layout();
-	let div = document.createElement("DIV");  
-	div.id = "layout" + cl;
-	div.className = "layouts";      
-	div.style.width = "200px";
-	document.getElementById("layout-settings").appendChild(div); //
-	document.getElementById("layout" + cl).appendChild(document.createTextNode("layout " + cl));
-                     
-
-	let btn_on_off = document.createElement('input');
-	btn_on_off.type = "checkbox";
-	btn_on_off.value = "On";
-	btn_on_off.id = "btn_on_off"+cl;
-	document.getElementById("layout" + cl).appendChild(btn_on_off); //
-	let btn_up = document.createElement('input');
-	btn_up.type = "button";
-	btn_up.value = "^";
-	btn_up.id = "btn_up"+cl;
-	document.getElementById("layout" + cl).appendChild(btn_up); //
-	let btn_down = document.createElement('input');
-	btn_down.type = "button";
-	btn_down.value = "v";
-	btn_down.id = "btn_down"+cl;
-	document.getElementById("layout" + cl).appendChild(btn_down); //
+	// 
+	layouts.push(new Layouts(cur_l));
+	layouts[cur_l].create_layout();
+	layouts[cur_l].createDiv();
 }
-function deleteDivLayout(cl){
-	if (cl > 0){
+
+function deleteDivLayout(cur_l){
+	if (layouts.length > 1){
 		changelayout();
-		document.getElementById("layout"+cl).outerHTML = ""; // DELETE THE DIV
-		layouts.splice(cl,1); // DELETE FROM LAYOUT ARRAY
+		document.getElementById("layout"+cur_l).outerHTML = ""; // DELETE THE DIV
+		layouts.splice(cur_l,1); // DELETE FROM LAYOUT ARRAY
 		current_layout--;
 	}
 }
@@ -1276,22 +1253,21 @@ class Joints {
 
 // LAYOUTS IS AN ARRAY OF LAYOUTS() AND LAYOUTS HAS AN ARRAY OF JOINTS() AS LAYOUT
 class Layouts { // layouts[current_layout].layout[value]
-	constructor() {
+	constructor(id) {
 		this.layout = [];
-		this.type;
-		this.name;
+		this.id = id;
 		this.index = 0;
 		this.selectindex = 0;
 		this.visible = true;
+		this.div;
 	}
 
-	create_layout(type = "jts") { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
+	create_layout() { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
 		for (let i = 0; i < 2000; i++) { // CREATE 2000 POSSIBLE LINE, MIGHT CHANGE THIS
 			this.layout.push(new Joints());
 		}
-		this.type = type
-		this.name = type + String(current_layout);
 	}
+
 
 	set_layout(array) {
 		this.layout = array;
@@ -1319,6 +1295,59 @@ class Layouts { // layouts[current_layout].layout[value]
 	
 	setvisible(bool){
 		this.visible = bool;
+	}
+
+	createDiv(){
+	
+	this.div = document.createElement("DIV");  
+	this.div.id = "layout" + this.id;
+	this.div.className = "layouts";      
+	this.div.style.width = "200px";
+	document.getElementById("layout-settings").appendChild(this.div); //
+	document.getElementById("layout" + this.id).appendChild(document.createTextNode("layout " + this.id));
+                     
+
+	let btn_on_off = document.createElement('input');
+	btn_on_off.type = "checkbox";
+	btn_on_off.value = "On";
+	btn_on_off.id = "btn_on_off"+this.id;
+	document.getElementById("layout" + this.id).appendChild(btn_on_off); //
+	let btn_up = document.createElement('input');
+	btn_up.type = "button";
+	btn_up.value = "^";
+	btn_up.id = "btn_up"+this.id;
+	btn_up.onclick = function () { // EDIT
+			let layout1 = cl;
+			let layout2;
+			let permut = new Layouts();
+			if (!(layout1 === layouts.length)){
+			layout2 = layout1+1;
+			permut = layouts[layout1];
+			layouts[layout1] = layouts[layout2];
+			layouts[layout2] = permut;
+			changelayout();
+		}
+		
+	}
+	document.getElementById("layout" + this.id).appendChild(btn_up); //
+	let btn_down = document.createElement('input');
+	btn_down.type = "button";
+	btn_down.value = "v";
+	btn_down.id = "btn_down"+this.id;
+	btn_down.onclick = function () { // edit
+		let layout1 = cl;
+		let layout2;
+		let permut = new Layouts();
+		if (!(layout1 === 0 )){
+			layout2 = layout1-1;
+			permut = layouts[layout1];
+			layouts[layout1] = layouts[layout2];
+			layouts[layout2] = permut;
+			
+		}
+		
+	}
+	document.getElementById("layout" + this.id).appendChild(btn_down); //
 	}
 
 }
