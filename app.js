@@ -1197,6 +1197,7 @@ class Layouts { // layouts[current_layout].layout[value]
         this.selectindex = 0;
         this.visible = true;
         this.div;
+        this.label;
         this.btn_on_off;
         this.btn_up;
 		this.btn_down;
@@ -1234,24 +1235,30 @@ class Layouts { // layouts[current_layout].layout[value]
         this.div.style.height = "40px";
         this.div.style.position = "absolute";
         document.getElementById("layout-settings").appendChild(this.div); //
-        document.getElementById("layout" + this.id).appendChild(document.createTextNode("layout " + this.id));
+        this.label = document.createElement('label');
+        this.label.innerHTML = "layout"+this.id;
+        this.label.className = "layoutlabel";
+        document.getElementById("layout" + this.id).appendChild(this.label);
         this.btn_on_off = document.createElement('input');
         this.btn_on_off.type = "checkbox";
         this.btn_on_off.value = "On";
         this.btn_on_off.id = "btn_on_off" + this.id;
+        this.btn_on_off.className = "btn_on_off";
         document.getElementById("layout" + this.id).appendChild(this.btn_on_off); //
         this.btn_up = document.createElement('input');
         this.btn_up.type = "button";
-        this.btn_up.value = "^";
+        this.btn_up.value = "↑";
         this.btn_up.id = "btn_up" + this.id;
+        this.btn_up.className = "btn_up";
         this.btn_up.onclick = function() {
             LayoutUp(this.id.replace("btn_up", ""));
         }
         document.getElementById("layout" + this.id).appendChild(this.btn_up); //
         this.btn_down = document.createElement('input');
         this.btn_down.type = "button";
-        this.btn_down.value = "v";
+        this.btn_down.value = "↓";
         this.btn_down.id = "btn_down" + this.id;
+        this.btn_down.className = "btn_down";
         this.btn_down.onclick = function() {
             LayoutDown(this.id.replace("btn_down", ""));
         }
@@ -1260,6 +1267,7 @@ class Layouts { // layouts[current_layout].layout[value]
         this.btn_del.type = "button";
         this.btn_del.value = "X";
         this.btn_del.id = "btn_down" + this.id;
+        this.btn_del.className = "btn_del";
         this.btn_del.onclick = function() {
             LayoutDel(this.id.replace("btn_down", ""));
         }
