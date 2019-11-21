@@ -1,7 +1,7 @@
 // TODO -------------------
-// LAYOUT SETTINGS - CREATE DELETE ZPLUS ZMINUS VISIBLEORNOT MOVE FLIP X Y  AND VISUAL SETTINGS
+// LAYOUT SETTINGS -  DELETE MOVE FLIP X Y  AND VISUAL SETTINGS
 // SOMES ISSUES WITH RESET POS MAKE A GAP -- DOESNT MATTER TOO MUCH
-// MAKE THICKNESS APPLY WITH ZOOM
+// MAKE THICKNESS APPLY WITH ZOOM -- SOMES ISSUES TRYING EDIT SELECT ONE WITH ZOOM
 // FIND NICE ICONS.......................
 //  DECLARE -------------------------------------------------------------------------------------------------------------------------------------
 var layouts = [];
@@ -29,6 +29,7 @@ function setup() {
     background(106, 116, 149); // BG COLOR
     bgcolor = color(106, 116, 149);
     current_layout = 0;
+    layout_created = 0;
     createDivLayout(current_layout);
     // CREATE LAYOUT 
 
@@ -144,16 +145,27 @@ function setup() {
 function draw() {
 
     for (let c = 0; c < layouts.length; c++) {
-        if (document.getElementById("btn_on_off" + c).checked) {
+
+        if (document.getElementById("btn_on_off" + layouts[c].id).checked) {
             layouts[c].setvisible(false);
         } else {
             layouts[c].setvisible(true);
-        }
+		}
+		
+		document.getElementById("layout"+layouts[c].id).onclick = () => current_layout = c;
+	
+    }
+
+    if (current_layout > layouts.length-1){
+        current_layout--;
     }
 
     for (let c = layouts.length - 1; c >= 0; c--) { // DRAW LAYOUTS DIV IN REVERSE
         layouts[c].div.style.top = String(40 + (Math.abs(c - layouts.length)) * 40) + "px";
-    }
+	}
+	
+	console.log(layouts);
+	console.log(current_layout);
 
     // MAIN
     if (document.getElementById('show-draw-settings').checked) { // IF USERS OPEN DRAW EDITOR
@@ -168,7 +180,7 @@ function draw() {
     }
 
 
-    // console.log(); // FOR NOOB TESTING
+	// console.log(); // FOR NOOB TESTING
 
 
 
@@ -181,7 +193,6 @@ function keyTyped() {
         if ((key === 'd') || (key === 'D')) {
             deletejoint();
         }
-
         if ((key === 'c') || (key === 'C')) {
             duplicatejoint();
         }
@@ -199,11 +210,9 @@ function keyTyped() {
         if ((key === '+')) {
             apply_zoom(125);
         }
-
         if ((key === 't') || (key === 'T')) {
             resetzoom();
         }
-
         if ((key === '&')) {
             if (showpoints.p1 === true) {
                 showpoints.p1 = false;
@@ -211,7 +220,6 @@ function keyTyped() {
                 showpoints.p1 = true;
             }
         }
-
         if ((key === '"')) {
             if (showpoints.p2 === true) {
                 showpoints.p2 = false;
@@ -219,7 +227,6 @@ function keyTyped() {
                 showpoints.p2 = true;
             }
         }
-
         if ((key === 'é')) {
             if (showpoints.pc === true) {
                 showpoints.pc = false;
@@ -229,26 +236,18 @@ function keyTyped() {
         }
 
         if ((key === "a" || key === 'A')) {
-            current_layout++;
-            createDivLayout(current_layout);
-        }
-        if ((key === "q" || key === 'Q')) {
-            deleteDivLayout(current_layout);
-
+            createDivLayout(layouts.length);
         }
     }
 }
 
 function keyReleased() {
-
     if (dragspace.key === true) { // DRAG CAMERA
         dragspace.key = false;
         dragspace.lock = false;
         if (locked === false) {
             Select.state = false;
         }
-
-
         for (let c = 0; c < layouts.length; c++) {
             for (let i = 0; i < layouts[c].index; i++) {
                 layouts[c].layout[i].endmoving();
@@ -256,7 +255,6 @@ function keyReleased() {
         }
         cursor(ARROW);
     }
-
 }
 
 function mouseWheel(event) { // ZOOM      - NEED FIX SOMES ISSUES
@@ -269,7 +267,6 @@ function mouseWheel(event) { // ZOOM      - NEED FIX SOMES ISSUES
 // MOUSE FUNCTIONS --------------------------------------------------------------------------------------------------------------------------------
 
 function mousePressed() {
-
     if (document.getElementById("show-draw-settings").checked) {
         SpaceNotAllowed.left = 250;
         SpaceNotAllowed.right = 200;
@@ -277,7 +274,6 @@ function mousePressed() {
         SpaceNotAllowed.left = 50;
         SpaceNotAllowed.right = 0;
     }
-
     if ((mouseX > SpaceNotAllowed.left) && (mouseX < (windowWidth - SpaceNotAllowed.right))) { // CANNOT DRAW IF MOUSE ON PARAMETERS
         locked = true;
     } else {
@@ -291,13 +287,11 @@ function mousePressed() {
 
 function mouseDragged() {
     if (locked) {
-
         mspos = {
             x: mouseX,
             y: mouseY
         };
         dragged = true;
-
     }
 }
 
@@ -317,7 +311,6 @@ function mouseReleased() {
 
 function DragZoom() {
     if (dragspace.key === true && dragged === true && isDrawing === false) { // DRAG CAMERA
-
         Select.state = true;
         if (dragspace.lock === false) {
             dragspace.x = mouseX;
@@ -332,25 +325,19 @@ function DragZoom() {
             }
 
         }
-
         for (let c = 0; c < layouts.length; c++) {
             for (let i = 0; i < layouts[c].index; i++) {
                 layouts[c].layout[i].moving(dragspace.x, dragspace.y);
             }
         }
-
         cardinal.x = dragspace.carx - (dragspace.x - mspos.x);
         cardinal.y = dragspace.cary - (dragspace.y - mspos.y);
         zoom.centerx = cardinal.x + (tfmbg_width / 2) * zoomvalue;
         zoom.centery = cardinal.y + (tfmbg_height / 2) * zoomvalue;
-
-
     }
-
 }
 
 function apply_zoom(value) {
-
     if ((value < 0) && (zoom.step > -2)) { // -
         zoom_less();
         zoom.step--;
@@ -368,7 +355,6 @@ function apply_zoom(value) {
     } else if (zoom.step < -2) {
         zoom.step = -2;
     }
-
 }
 
 function zoom_more() {
@@ -416,23 +402,17 @@ function DisplayJoints(showpts = true) {
 
             }
         }
-
-
         for (let i = 0; i < layouts[c].index; i++) {
             if (layouts[c].visible) {
                 if (layouts[c].layout[i].foreground === true) {
                     layouts[c].layout[i].display();
                 }
             }
-
-
         }
     }
-
-
     if (showpts) {
         for (let c = 0; c < layouts.length; c++) {
-            if (layouts[c].visible) {
+            if (layouts[c].visible && c === current_layout) {
                 for (let i = 0; i < layouts[c].index; i++) {
 
                     if (i === layouts[c].selectindex) {
@@ -445,31 +425,21 @@ function DisplayJoints(showpts = true) {
                 }
             }
         }
-
-
-    }
-
-    // DISPLAY ALL JOINTS CREATED
+    }   // DISPLAY ALL JOINTS CREATED
 }
 
 
 function SyncSettingsDOM() {
     // PROPERTIES SETTINGS  
-
     // DEFAULT
-
     if (($('#defaultcolorval').is(":hover")) || ($('#defaultcolorval').is(":focus"))) {
         $('#defaultcolor').minicolors('value', document.getElementById("defaultcolorval").value);
-
-
     } else {
         rgbvald = $('#defaultcolor').minicolors('rgbObject');
         DefaultColor = rgbvald;
         document.getElementById('directDcolor').style.backgroundColor = rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b);
         document.getElementById("defaultcolorval").value = rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b).toUpperCase();
-
     }
-
     if (($('#defaultalphaval').is(":hover")) || ($('#defaultalphaval').is(":focus"))) {
         $('#defaultcolor').minicolors('opacity', document.getElementById("defaultalphaval").value);
 
@@ -477,73 +447,50 @@ function SyncSettingsDOM() {
         DefaultAlpha = $('#defaultcolor').minicolors('opacity');
         document.getElementById('directDcolor').style.opacity = $('#defaultcolor').minicolors('opacity');
         document.getElementById("defaultalphaval").value = $('#defaultcolor').minicolors('opacity');
-
     }
-
     // SELECT
-
     if (($('#selectcolorval').is(":hover")) || ($('#selectcolorval').is(":focus"))) {
         $('#selectcolor').minicolors('value', document.getElementById("selectcolorval").value);
-
-
     } else {
         rgbvals = $('#selectcolor').minicolors('rgbObject');
         SelectColor = rgbvals;
-
         if (!(rgbToHex(SelectColor.r, SelectColor.g, SelectColor.b).toUpperCase() === document.getElementById('selectcolorval').value)) {
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_color(SelectColor.r, SelectColor.g, SelectColor.b);
         }
-
         document.getElementById('directScolor').style.backgroundColor = rgbToHex(SelectColor.r, SelectColor.g, SelectColor.b);
         document.getElementById("selectcolorval").value = rgbToHex(SelectColor.r, SelectColor.g, SelectColor.b).toUpperCase();
-
-
     }
-
     if (($('#selectalphaval').is(":hover")) || ($('#selectalphaval').is(":focus"))) {
         $('#selectcolor').minicolors('opacity', document.getElementById("selectalphaval").value);
-
     } else {
         SelectAlpha = $('#selectcolor').minicolors('opacity');
-
         if (!(SelectAlpha === document.getElementById('selectalphaval').value)) {
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(SelectAlpha);
         }
-
         document.getElementById('directScolor').style.opacity = $('#selectcolor').minicolors('opacity');
         $('#selectcolor').minicolors({
             change: document.getElementById("selectalphaval").value = $('#selectcolor').minicolors('opacity')
         });
-
     }
-
     // P1 AND P2 SETTINGS
-
     if (!(($('#p1x').is(":hover")) || ($('#p1x').is(":focus")))) {
         document.getElementById('p1x').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().x - cardinal.x) / zoomvalue);
     }
-
     if (!(($('#p1x').is(":hover")) || ($('#p1y').is(":focus")))) {
         document.getElementById('p1y').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1().y - cardinal.y) / zoomvalue);
     }
-
     if (!(($('#p1x').is(":hover")) || ($('#p2x').is(":focus")))) {
         document.getElementById('p2x').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().x - cardinal.x) / zoomvalue);
     }
-
     if (!(($('#p1x').is(":hover")) || ($('#p2y').is(":focus")))) {
         document.getElementById('p2y').value = Math.round((layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2().y - cardinal.y) / zoomvalue);
     }
-
     document.getElementById('selectindex').value = Number(layouts[current_layout].selectindex); // SYNC INDEX
-
-
 }
 
 function Drawing() {
     if ((Select.state === false) && (dragspace.key === false)) {
         if (mouseIsPressed) {
-
             if (locked === true && dragged === false && isDrawing === false) {
                 layouts[current_layout].selectindex = layouts[current_layout].index;
                 layouts[current_layout].layout[layouts[current_layout].index].set_color(DefaultColor.r, DefaultColor.g, DefaultColor.b); // DEFAULT SETTER
@@ -561,28 +508,21 @@ function Drawing() {
                     layouts[current_layout].layout[layouts[current_layout].index].display();
                     layouts[current_layout].layout[layouts[current_layout].index].displaypoints(); // DISPLAY THE DRAWING ONE , REQUIRED   
                 }
-
             }
         }
-
         if (locked === false && dragged === false && isDrawing === true) {
             isDrawing = false;
             layouts[current_layout].up_index();
-
             // HISTORY COLORS SET
             updateSelecteSI(DefaultE); // SYNC PARAM
-
-
             if (swatchesindex.z === 0) {
                 swatchesindex.previous = 6;
             } else {
                 swatchesindex.previous = swatchesindex.z - 1;
             }
-
             if (swatchesindex.z > 6) {
                 swatchesindex.z = 0;
             }
-
             for (i = 0; i < swatchescolor.length; i++) {
                 if (!(i === swatchesindex.z)) {
                     if ((rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b) === swatchescolor[i].color)) {
@@ -592,9 +532,7 @@ function Drawing() {
                         swatchescolor.checking = true;
                     }
                 }
-
             }
-
             if (swatchescolor.checking === true) {
                 swatchescolor[swatchesindex.z] = {
                     name: rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b).toUpperCase(),
@@ -607,14 +545,10 @@ function Drawing() {
                     swatches: swatchescolor
                 });
                 swatchesindex.z++;
-
             }
-
             // SYNC PARAM
-
             $('#selectcolor').minicolors('value', rgbToHex(DefaultColor.r, DefaultColor.g, DefaultColor.b));
             $('#selectcolor').minicolors('opacity', DefaultAlpha);
-
             if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === false) { // SYNC FB
                 $("#selectbf").prop("checked", false);
                 layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = false;
@@ -624,7 +558,6 @@ function Drawing() {
             }
         }
     }
-
 }
 
 function Cursoring() {
@@ -671,29 +604,21 @@ function Cursoring() {
             cursor(ARROW);
         }
     }
-
 }
 
 function Editing() {
     if (isEdit.state === true) {
-
-
         if (savealpha.state === false) { // SAUVEGARDE ALPHA INITIAL
             savealpha.alpha = layouts[current_layout].layout[layouts[current_layout].selectindex].c.a;
             savealpha.state = true;
         }
-
-
         if (isEdit.pnumber === 1) { // MOVE P1
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_p1(mspos.x, mspos.y);
-
         } else if (isEdit.pnumber === 2) { // MOVE P2
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_p2(mspos.x, mspos.y);
-
         } else if (isEdit.pnumber === 12) { // MOVE P1 AND P2
-
             if (isEdit.taked === false) { // SAVE THE ORIGINAL POSITION
                 isEdit.p1pos = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p1();
                 isEdit.p2pos = layouts[current_layout].layout[layouts[current_layout].selectindex].get_p2();
@@ -703,7 +628,6 @@ function Editing() {
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(0.5);
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_p1(Math.round(isEdit.p1pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p1pos.y - (isEdit.pcenter.y - mspos.y)));
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_p2(Math.round(isEdit.p2pos.x - (isEdit.pcenter.x - mspos.x)), Math.round(isEdit.p2pos.y - (isEdit.pcenter.y - mspos.y)));
-
         }
         if (locked === false) {
             isEdit.state = false;
@@ -711,14 +635,10 @@ function Editing() {
             layouts[current_layout].layout[layouts[current_layout].selectindex].set_alpha(savealpha.alpha);
             savealpha.state = false;
         }
-
         // SYNC PARAM
         $('#selectcolor').minicolors('value', rgbToHex(layouts[current_layout].layout[layouts[current_layout].selectindex].c.r, layouts[current_layout].layout[layouts[current_layout].selectindex].c.g, layouts[current_layout].layout[layouts[current_layout].selectindex].c.b).substring(1));
         $('#selectcolor').minicolors('opacity', savealpha.alpha);
-
         updateSelecteSI(layouts[current_layout].layout[layouts[current_layout].selectindex].e);
-
-
         if (document.getElementById('selectbf').checked === true && layouts[current_layout].layout[layouts[current_layout].selectindex].foreground === false) { // SYNC FB 
             $("#selectbf").prop("checked", false);
             layouts[current_layout].layout[layouts[current_layout].selectindex].foreground = false;
@@ -732,7 +652,6 @@ function Editing() {
 
 function deletejoint() {
     if (isDrawing === false) {
-
         let indexcompt = layouts[current_layout].selectindex;
         while (indexcompt < layouts[current_layout].index) {
             copyjoint(layouts[current_layout].layout[indexcompt], layouts[current_layout].layout[indexcompt + 1]);
@@ -744,7 +663,6 @@ function deletejoint() {
         if (layouts[current_layout].index >= 1) {
             layouts[current_layout].selectindex = layouts[current_layout].index - 1;
         }
-
         Select.state = false;
     }
 }
@@ -756,9 +674,7 @@ function duplicatejoint() {
             layouts[current_layout].selectindex = layouts[current_layout].index;
             layouts[current_layout].up_index();
         }
-
         Select.state = false;
-
     }
 }
 
@@ -772,7 +688,6 @@ function zplus() {
             copyjoint(layouts[current_layout].layout[layouts[current_layout].selectindex], save);
             layouts[current_layout].selectindex++;
         }
-
     }
 }
 
@@ -805,7 +720,6 @@ function resetpos() { // DETERMINE THE DISTANCE BETWEEN THE ACTUAL CARDINAL AND 
     cardinal.y = cardinal.y - dist.y;
     zoom.centerx = cardinal.x + (tfmbg_width / 2) * zoomvalue;
     zoom.centery = cardinal.y + (tfmbg_height / 2) * zoomvalue;
-
     for (let c = 0; c < layouts.length; c++) {
         for (let i = 0; i < layouts[c].index; i++) {
             layouts[c].layout[i].moveby(-dist.x, -dist.y);
@@ -864,7 +778,6 @@ function opensettings(setchoose) { // CLOSE ALL OTHER EDITOR WHEN YOU OPEN ONE
 }
 
 function changelayout() { // RESET SELECTED VALUE NOT ATTRIBUATE TO LAYOUTS CLASS
-
     isEdit = {
         state: false,
         pnumber: 0,
@@ -885,9 +798,10 @@ function changelayout() { // RESET SELECTED VALUE NOT ATTRIBUATE TO LAYOUTS CLAS
 function createDivLayout(cur_l) {
     changelayout();
     // 
-    layouts.push(new Layouts(cur_l));
+    layouts.push(new Layouts(layout_created));
     layouts[cur_l].create_layout();
     layouts[cur_l].createDiv();
+    layout_created++;
 }
 
 function getLayoutPos(id) {
@@ -901,43 +815,35 @@ function getLayoutPos(id) {
 function LayoutDown(layout_id) {
     let layout_save = new Layouts(999);
     let id = getLayoutPos(layout_id);
-    let min_id = Number(layouts[0].id);
-
+	let min_id = Number(layouts[0].id);
+	changelayout();
     if (!(Number(layouts[id].id) === min_id)) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) - 1];
         layouts[Number(id) - 1] = layout_save;
 
     }
-
-
-
-
 }
 
 function LayoutUp(layout_id) {
     let layout_save = new Layouts(999);
     let id = getLayoutPos(layout_id);
     let max_id = Number(layouts[layouts.length - 1].id);
-
+	changelayout();
     if (!(Number(layouts[id].id) === max_id)) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) + 1];
         layouts[Number(id) + 1] = layout_save;
 
     }
-
-
-
-
 }
 
-function deleteDivLayout(cur_l) {
-    if (layouts.length > 1) {
-        changelayout();
-        document.getElementById("layout" + cur_l).outerHTML = ""; // DELETE THE DIV
-        layouts.splice(cur_l, 1); // DELETE FROM LAYOUT ARRAY
-        current_layout--;
+function LayoutDel(layout_id){
+	let id = getLayoutPos(layout_id);
+	changelayout();
+	if (layouts.length > 1){
+		document.getElementById("layout" + layouts[id].id).outerHTML = "";
+		layouts.splice(id,1);
     }
 }
 
@@ -953,9 +859,6 @@ function updateDefaulteSI(val) {
 function setDefaulteSI(val) {
     DefaultE = val;
 }
-
-
-
 
 // SELECT
 function updateSelecteSI(val) {
@@ -1003,9 +906,10 @@ function updatesbf() {
 // XML FUNCTIONS -----------------------------------------------------------------------------------------------------------------------------------
 // <C><P /><Z><S /><D /><O /><L><JD P1="245,184"P2="479,82"c="ffffff,2,1,0"/></L></Z></C>
 function savexml() {
+	resetzoom();
+    resetpos();
     let XML = "";
     XML += '<C><P /><Z><S /><D /><O /><L>';
-
     for (c = 0; c < layouts.length; c++) {
         for (i = 0; i < layouts[c].index; i++) {
             XML += `<JD P1="${layouts[c].layout[i].x1-cardinal.x},${layouts[c].layout[i].y1-cardinal.y}"P2="${layouts[c].layout[i].x2-cardinal.x},${layouts[c].layout[i].y2-cardinal.y}"c="`;
@@ -1019,7 +923,6 @@ function savexml() {
             XML += '"/>'
         }
     }
-
     XML += "</L></Z></C>";
     document.getElementById('save-xml').value = XML;
 }
@@ -1028,18 +931,13 @@ function savexml() {
 function loadxml() {
     resetzoom();
     resetpos();
-
     let XML = document.getElementById('load-xml').value;
     let JD;
     if (XML.startsWith('<C><P')) {
-
-
-
         XML = XML.substring(
             XML.lastIndexOf("<L>") + 3,
             XML.lastIndexOf("</L>")
         ); // FILTER THE JOINTS SECTION
-
         XML = XML.split("<");
         XML.splice(0, 1); // SPLIT ALL JD, also delete the first wrong value ""
         // ["JD P1=", "245,184", "P2=", "479,82", "c=", "ffffff,2,1,0", "/>"]
@@ -1051,12 +949,10 @@ function loadxml() {
                 y: 0,
                 JD: ""
             };
-
             if (!(JD[0] == "JPL P1=")) { // SHOULD IMPLEMENT JPL 
                 pt1.JD = JD[1].split(",");
                 pt1.x = Number(pt1.JD[0]);
                 pt1.y = Number(pt1.JD[1]);
-
                 let pt2 = {
                     x: 0,
                     y: 0,
@@ -1065,7 +961,6 @@ function loadxml() {
                 pt2.JD = JD[3].split(",");
                 pt2.x = Number(pt2.JD[0]);
                 pt2.y = Number(pt2.JD[1]);
-
                 let ptparam = {
                     color: "",
                     e: 0,
@@ -1084,66 +979,50 @@ function loadxml() {
                 ptcolor.r = hexToRgb(ptcolor.JD).r;
                 ptcolor.g = hexToRgb(ptcolor.JD).g;
                 ptcolor.b = hexToRgb(ptcolor.JD).b;
-
                 ptparam.e = Number(ptparam.JD[1]);
-
                 if (ptparam.JD.length <= 3) {
                     if ((Number(ptparam.JD[2]) < 1)) {
                         ptparam.a = Number(ptparam.JD[2]);
                     } else {
                         ptparam.a = 1;
                     }
-
                 }
                 if (ptparam.JD.length <= 4) {
                     ptparam.foreground = true;
                 } else {
                     ptparam.foreground = false;
                 }
-
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_p1(pt1.x + cardinal.x, pt1.y + cardinal.y);
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_p2(pt2.x + cardinal.x, pt2.y + cardinal.y);
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_color(ptcolor.r, ptcolor.g, ptcolor.b);
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_e(ptparam.e);
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_alpha(ptparam.a);
                 layouts[current_layout].layout[i + layouts[current_layout].index].set_foreground(ptparam.foreground);
-
             } // END IF
-
         } // END FOR
-
         layouts[current_layout].selectindex = XML.length + layouts[current_layout].index - 1;
         layouts[current_layout].index = XML.length + layouts[current_layout].index;
-
-
-
         // DISPLAY EXCEPT POINTS
         DisplayJoints(false);
-
     } // END IF STARTSWITH
     else {
         alert("You can't load a wrong XML");
     }
-
-
 }
 
 function clearAll() {
     if (confirm("Are you sure to delete all ?")) {
         layouts[current_layout].set_index(0);
         layouts[current_layout].selectindex = 0;
-
         for (let c = 0; c < layouts.length; c++) {
             for (let i = 0; i < layouts[c].length; i++) {
                 layouts[c].layout[i] = new Joints();
             }
-
             while (layouts.lenght > 1) {
                 layouts.pop();
             }
         }
     }
-
 }
 
 
@@ -1223,7 +1102,6 @@ class Joints {
             this.move.y2 = this.y2;
             this.move.cx = this.get_pc().x;
             this.move.cy = this.get_pc().y;
-
             this.move.lock = true;
         }
         this.x1 = this.move.x1 - (drx - mouseX);
@@ -1283,17 +1161,13 @@ class Joints {
             line(this.get_pc().x - 5, this.get_pc().y, this.get_pc().x + 5, this.get_pc().y);
             line(this.get_pc().x, this.get_pc().y - 5, this.get_pc().x, this.get_pc().y + 5);
         }
-
     }
 
     display() {
-
         // DRAW LINE
         stroke(`rgba(${this.c.r},${this.c.g},${this.c.b},${this.c.a})`);
         strokeWeight(this.e);
         line(this.x1, this.y1, this.x2, this.y2);
-
-
     }
 
     zoom(value) {
@@ -1311,10 +1185,7 @@ class Joints {
             this.y2 -= Math.round((this.y2 - zoom.centery) / 2);
             this.e /= 2;
         }
-
     }
-
-
 }
 
 // LAYOUTS IS AN ARRAY OF LAYOUTS() AND LAYOUTS HAS AN ARRAY OF JOINTS() AS LAYOUT
@@ -1328,7 +1199,8 @@ class Layouts { // layouts[current_layout].layout[value]
         this.div;
         this.btn_on_off;
         this.btn_up;
-        this.btn_down;
+		this.btn_down;
+		this.btn_del;
     }
 
     create_layout() { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
@@ -1336,20 +1208,9 @@ class Layouts { // layouts[current_layout].layout[value]
             this.layout.push(new Joints());
         }
     }
-
-
     set_layout(array) {
         this.layout = array;
     }
-
-    set_type(type) {
-        this.type = type;
-    }
-
-    set_name(name) {
-        this.name = name;
-    }
-
     set_index(value) {
         this.index = value;
     }
@@ -1361,11 +1222,9 @@ class Layouts { // layouts[current_layout].layout[value]
     down_index() {
         this.index = this.index - 1;
     }
-
     setvisible(bool) {
         this.visible = bool;
     }
-
     createDiv() {
 
         this.div = document.createElement("DIV");
@@ -1376,8 +1235,6 @@ class Layouts { // layouts[current_layout].layout[value]
         this.div.style.position = "absolute";
         document.getElementById("layout-settings").appendChild(this.div); //
         document.getElementById("layout" + this.id).appendChild(document.createTextNode("layout " + this.id));
-
-
         this.btn_on_off = document.createElement('input');
         this.btn_on_off.type = "checkbox";
         this.btn_on_off.value = "On";
@@ -1390,9 +1247,7 @@ class Layouts { // layouts[current_layout].layout[value]
         this.btn_up.onclick = function() {
             LayoutUp(this.id.replace("btn_up", ""));
         }
-
         document.getElementById("layout" + this.id).appendChild(this.btn_up); //
-
         this.btn_down = document.createElement('input');
         this.btn_down.type = "button";
         this.btn_down.value = "v";
@@ -1400,8 +1255,14 @@ class Layouts { // layouts[current_layout].layout[value]
         this.btn_down.onclick = function() {
             LayoutDown(this.id.replace("btn_down", ""));
         }
-
-        document.getElementById("layout" + this.id).appendChild(this.btn_down); //
+		document.getElementById("layout" + this.id).appendChild(this.btn_down); //
+		this.btn_del = document.createElement('input');
+        this.btn_del.type = "button";
+        this.btn_del.value = "X";
+        this.btn_del.id = "btn_down" + this.id;
+        this.btn_del.onclick = function() {
+            LayoutDel(this.id.replace("btn_down", ""));
+        }
+        document.getElementById("layout" + this.id).appendChild(this.btn_del); //
     }
-
 }
