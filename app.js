@@ -821,7 +821,10 @@ function LayoutDown(layout_id) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) - 1];
         layouts[Number(id) - 1] = layout_save;
-        current_layout--;
+        if (id === current_layout){
+                current_layout--;
+        }
+
     }
 }
 
@@ -834,7 +837,11 @@ function LayoutUp(layout_id) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) + 1];
         layouts[Number(id) + 1] = layout_save;
-        current_layout++;
+        
+        if (id === current_layout){
+                current_layout++;
+        }
+
     } 
 }
 
@@ -1236,8 +1243,9 @@ class Layouts { // layouts[current_layout].layout[value]
         this.div.style.height = "40px";
         this.div.style.position = "absolute";
         document.getElementById("layout-settings").appendChild(this.div); //
-        this.label = document.createElement('label');
-        this.label.innerHTML = "layout"+this.id;
+        this.label = document.createElement('input');
+        this.label.type = "text";
+        this.label.value = "L"+(layouts.length-1);
         this.label.className = "layoutlabel";
         document.getElementById("layout" + this.id).appendChild(this.label);
         this.btn_on_off = document.createElement('input');
