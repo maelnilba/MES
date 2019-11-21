@@ -134,6 +134,7 @@ function setup() {
         centerx: cardinal.x + ((tfmbg_width / 2) * zoomvalue),
         centery: cardinal.y + ((tfmbg_height / 2) * zoomvalue),
     };
+    
 
     background(106, 116, 149); // 
 
@@ -150,9 +151,9 @@ function draw() {
             layouts[c].setvisible(false);
         } else {
             layouts[c].setvisible(true);
-		}
-		
-        document.getElementById("layout"+layouts[c].id).onclick = () => current_layout = c;
+        }
+        
+        document.getElementById("layout"+layouts[c].id).ondblclick = () => current_layout = c;
         
         if (c === current_layout){
             document.getElementById("layout"+layouts[c].id).style.backgroundColor = '#4e7486';
@@ -820,7 +821,7 @@ function LayoutDown(layout_id) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) - 1];
         layouts[Number(id) - 1] = layout_save;
-
+        current_layout--;
     }
 }
 
@@ -833,8 +834,8 @@ function LayoutUp(layout_id) {
         layout_save = layouts[id];
         layouts[id] = layouts[Number(id) + 1];
         layouts[Number(id) + 1] = layout_save;
-
-    }
+        current_layout++;
+    } 
 }
 
 function LayoutDel(layout_id){

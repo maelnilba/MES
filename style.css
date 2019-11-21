@@ -405,10 +405,6 @@ input[type=text], input[type=number] {
   border:none;
 }
 
-.btn_on_off {
-  
-}
-
 .btn_del {
   background-color: rgb(209, 92, 92);
   color:white;
@@ -465,13 +461,14 @@ input[type=text], input[type=number] {
 
 .layouts {
   color:white;
-  display: flex; /* comportement visuel de cellule */
+  display: flex; 
   justify-content: space-around;
-  
+  transition: top 0.2s ease-out;
 }
 
 .layouts .layoutlabel {
   width: 70px;
+  font-size: 18px;
 }
 
 .layouts * {
