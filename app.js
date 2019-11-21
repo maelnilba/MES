@@ -563,7 +563,7 @@ function Cursoring() {
     // DETECT IF CURSOR ON A POINT
     if (isDrawing === false && dragspace.key === false) {
         for (let i = 0; i < layouts[current_layout].index; i++) {
-            if (((mouseX > (layouts[current_layout].layout[i].get_p1().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p1().x) + 10)) && (mouseY > (layouts[current_layout].layout[i].get_p1().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p1().y) + 10)) {
+            if ((((mouseX > (layouts[current_layout].layout[i].get_p1().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p1().x) + 10)) && (mouseY > (layouts[current_layout].layout[i].get_p1().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p1().y) + 10)) && showpoints.p1) {
                 Select.state = true;
                 Select.p = 1; // P1 
                 if ((locked === true) && (Select.state === true) && isEdit.state === false) {
@@ -572,7 +572,7 @@ function Cursoring() {
                     isEdit.pnumber = 1;
                 }
                 break;
-            } else if (((mouseX > (layouts[current_layout].layout[i].get_p2().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p2().x) + 10)) && ((mouseY > (layouts[current_layout].layout[i].get_p2().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p2().y) + 10))) {
+            } else if ((((mouseX > (layouts[current_layout].layout[i].get_p2().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_p2().x) + 10)) && ((mouseY > (layouts[current_layout].layout[i].get_p2().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_p2().y) + 10))) && showpoints.p2) {
                 Select.state = true;
                 Select.p = 2 // P2
                 if ((locked === true) && (Select.state === true) && isEdit.state === false) {
@@ -581,7 +581,7 @@ function Cursoring() {
                     isEdit.pnumber = 2;
                 }
                 break;
-            } else if (((mouseX > (layouts[current_layout].layout[i].get_pc().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_pc().x) + 10)) && ((mouseY > (layouts[current_layout].layout[i].get_pc().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_pc().y) + 10))) {
+            } else if ((((mouseX > (layouts[current_layout].layout[i].get_pc().x) - 10) && (mouseX < (layouts[current_layout].layout[i].get_pc().x) + 10)) && ((mouseY > (layouts[current_layout].layout[i].get_pc().y) - 10) && (mouseY < (layouts[current_layout].layout[i].get_pc().y) + 10))) && showpoints.pc) {
                 Select.state = true;
                 Select.p = 12 // PCENTER
                 if ((locked === true) && (Select.state === true) && isEdit.state === false) {
@@ -1018,9 +1018,9 @@ function clearAll() {
         for (let i = 0; i < layouts[0].index; i++) {
             layouts[0].layout[i] = new Joints();
         }
-        console.log(layouts);
-        
 
+        layouts[0].index = 0;layouts[0].selectindex = 0;
+    
         layout_created = 1;
     }
 }
