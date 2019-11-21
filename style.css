@@ -361,7 +361,7 @@ input[type=text], input[type=number] {
   outline:0;
 }
 
-.save-xml, .load-xml, .clear {
+.save-xml, .load-xml, .clear, .create-layout {
   margin-left: 15px;
   margin-right: 15px;
   width: 80px;
@@ -393,12 +393,12 @@ input[type=text], input[type=number] {
   outline:none;
 }
 
-.save-xml:hover, .load-xml:hover {
+.save-xml:hover, .load-xml:hover, .create-layout:hover {
   background-color: rgb(255, 255, 255);
   outline: none;
 }
 
-.save-xml:active, .load-xml:active {
+.save-xml:active, .load-xml:active, .create-layout:active {
   background-color: rgba(236, 225, 225, 0.5);
   border:none;
   outline:none;
@@ -428,7 +428,7 @@ input[type=text], input[type=number] {
 }
 
 .layouts {
-  background-color: white;
+  color:white;
 }
 
 label {

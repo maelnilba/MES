@@ -152,7 +152,13 @@ function draw() {
             layouts[c].setvisible(true);
 		}
 		
-		document.getElementById("layout"+layouts[c].id).onclick = () => current_layout = c;
+        document.getElementById("layout"+layouts[c].id).onclick = () => current_layout = c;
+        
+        if (c === current_layout){
+            document.getElementById("layout"+layouts[c].id).style.backgroundColor = '#4e7486';
+        } else {
+            document.getElementById("layout"+layouts[c].id).style.backgroundColor = '#324650';
+        }
 	
     }
 
@@ -163,9 +169,6 @@ function draw() {
     for (let c = layouts.length - 1; c >= 0; c--) { // DRAW LAYOUTS DIV IN REVERSE
         layouts[c].div.style.top = String(40 + (Math.abs(c - layouts.length)) * 40) + "px";
 	}
-	
-	console.log(layouts);
-	console.log(current_layout);
 
     // MAIN
     if (document.getElementById('show-draw-settings').checked) { // IF USERS OPEN DRAW EDITOR
@@ -233,10 +236,6 @@ function keyTyped() {
             } else {
                 showpoints.pc = true;
             }
-        }
-
-        if ((key === "a" || key === 'A')) {
-            createDivLayout(layouts.length);
         }
     }
 }
@@ -1012,16 +1011,17 @@ function loadxml() {
 
 function clearAll() {
     if (confirm("Are you sure to delete all ?")) {
-        layouts[current_layout].set_index(0);
-        layouts[current_layout].selectindex = 0;
-        for (let c = 0; c < layouts.length; c++) {
-            for (let i = 0; i < layouts[c].length; i++) {
-                layouts[c].layout[i] = new Joints();
-            }
-            while (layouts.lenght > 1) {
-                layouts.pop();
-            }
+        current_layout = 0;
+        for (let c = layout_created-1; c > 0; c--) {
+            LayoutDel(c);
         }
+        for (let i = 0; i < layouts[0].index; i++) {
+            layouts[0].layout[i] = new Joints();
+        }
+        console.log(layouts);
+        
+
+        layout_created = 1;
     }
 }
 
