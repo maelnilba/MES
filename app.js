@@ -1202,6 +1202,7 @@ class Layouts { // layouts[current_layout].layout[value]
         this.layout = [];
         this.id = id;
         this.index = 0;
+        this.z = 0;
         this.selectindex = 0;
         this.visible = true;
         this.div;
@@ -1209,7 +1210,8 @@ class Layouts { // layouts[current_layout].layout[value]
         this.btn_on_off;
         this.btn_up;
 		this.btn_down;
-		this.btn_del;
+        this.btn_del;
+        this.set_z;
     }
 
     create_layout() { // TYPE SHOULD BE JTS FOR JOINTS TXT FOR TEXT ..
@@ -1281,5 +1283,11 @@ class Layouts { // layouts[current_layout].layout[value]
             LayoutDel(this.id.replace("btn_down", ""));
         }
         document.getElementById("layout" + this.id).appendChild(this.btn_del); //
+        this.set_z = document.createElement('input');
+        this.set_z.type = "text";
+        this.set_z.value = "0";
+        this.set_z.className = "layoutlabelz";
+        this.set_z.oninput = () => this.z = this.value;
+        document.getElementById("layout" + this.id).appendChild(this.set_z);
     }
 }

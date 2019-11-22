@@ -467,10 +467,17 @@ input[type=text], input[type=number] {
 }
 
 .layouts .layoutlabel {
-  width: 70px;
+  width: 60px;
   font-size: 18px;
   background-color: transparent;
   text-align: center;
+}
+
+.layoutlabelz {
+  width: 20px;
+  text-align: center;
+  font-size: 18px;
+  background-color: transparent;
 }
 
 .layouts * {
