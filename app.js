@@ -852,6 +852,10 @@ function LayoutDel(layout_id){
 		document.getElementById("layout" + layouts[id].id).outerHTML = "";
 		layouts.splice(id,1);
     }
+
+    if (id < current_layout){
+        current_layout--;
+    }
 }
 
 
