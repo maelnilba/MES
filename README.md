@@ -9,3 +9,6 @@ In progress ...
 
 
 Uses : P5 and jQuery MiniColors Libraries
+
+
+Drawing Part Done ----- PROJECT ON STANDBY
